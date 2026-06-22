@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-base text-primary font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .dot-grid {
+    background-image: radial-gradient(rgba(241, 245, 249, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .text-gradient {
+    @apply bg-hero-gradient bg-clip-text text-transparent;
+  }
+
+  .glass-nav {
+    @apply bg-base/80 backdrop-blur-xl;
+  }
+}
