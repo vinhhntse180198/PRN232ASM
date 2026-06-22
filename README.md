@@ -6,9 +6,12 @@ Kiến trúc: **Microservices** (Monorepo)
 
 ```
 PRN232ASM/
-├── docs/
-├── docker/
-├── src/
+├── fe/                         # Frontend (React + Vite + Tailwind)
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── be/                         # Backend (Microservices)
 │   ├── Gateway/ApiGateway/
 │   ├── BuildingBlocks/
 │   ├── Services/
@@ -17,9 +20,12 @@ PRN232ASM/
 │   │   ├── TrendService/
 │   │   ├── NotificationService/
 │   │   └── SyncService/
-│   └── Frontends/web-client/
-├── tests/
-└── backend/                    # (template cũ — có thể xóa sau)
+│   ├── tests/
+│   └── backend.sln
+│
+├── docker/
+├── docs/
+└── README.md
 ```
 
 ## Services & Database (Supabase)
@@ -32,6 +38,17 @@ PRN232ASM/
 | TrendService         | 5003 | trend_db    |
 | NotificationService  | 5004 | notify_db   |
 | SyncService          | 5005 | sync_db     |
+
+## Chạy local
+
+```bash
+# Frontend
+cd fe
+npm install
+npm run dev
+
+# Backend — từng service trong be/Services/...
+```
 
 ## Mỗi service gồm 4 layers
 
