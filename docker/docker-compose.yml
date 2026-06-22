@@ -1,0 +1,31 @@
+services:
+  api-gateway:
+    build:
+      context: ../be
+      dockerfile: Gateway/ApiGateway/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ReverseProxy__Clusters__paper-cluster__Destinations__paper__Address: http://paper-service:8080
+      ReverseProxy__Clusters__auth-cluster__Destinations__auth__Address: http://auth-service:8080
+    depends_on:
+      - paper-service
+
+  paper-service:
+    build:
+      context: ../be
+      dockerfile: Services/PaperService/PaperService.Api/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: ${PAPER_DB_CONNECTION}
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d

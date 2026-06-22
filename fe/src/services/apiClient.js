@@ -1,4 +1,4 @@
-const PAPER_API_URL = import.meta.env.VITE_PAPER_API_URL || 'http://localhost:5002'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export function getAccessToken() {
   return localStorage.getItem('accessToken')
@@ -12,7 +12,7 @@ export async function apiRequest(path, { method = 'GET', body, auth = false } = 
     if (token) headers.Authorization = `Bearer ${token}`
   }
 
-  const res = await fetch(`${PAPER_API_URL}${path}`, {
+  const res = await fetch(`${API_URL}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
@@ -25,4 +25,4 @@ export async function apiRequest(path, { method = 'GET', body, auth = false } = 
   return data
 }
 
-export { PAPER_API_URL }
+export { API_URL }

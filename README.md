@@ -32,7 +32,7 @@ PRN232ASM/
 
 | Service              | Port | Database    |
 |----------------------|------|-------------|
-| ApiGateway           | 5000 | —           |
+| **ApiGateway**       | **5000** | —       |
 | AuthService          | 5001 | auth_db     |
 | PaperService         | 5002 | paper_db    |
 | TrendService         | 5003 | trend_db    |
@@ -42,13 +42,21 @@ PRN232ASM/
 ## Chạy local
 
 ```bash
-# Frontend
+# 1. Paper Service
+cd be/Services/PaperService/PaperService.Api
+dotnet run
+
+# 2. API Gateway (terminal khác)
+cd be/Gateway/ApiGateway
+dotnet run
+
+# 3. Frontend
 cd fe
 npm install
 npm run dev
-
-# Backend — từng service trong be/Services/...
 ```
+
+Frontend gọi **http://localhost:5000** (Gateway) → route tới từng service.
 
 ## Mỗi service gồm 4 layers
 

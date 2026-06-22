@@ -1,0 +1,20 @@
+# YARP routing reference (mirrors appsettings.json)
+
+| Route | Service | Port |
+|-------|---------|------|
+| /api/auth/* | AuthService | 5001 |
+| /api/papers/* | PaperService | 5002 |
+| /api/journals/* | PaperService | 5002 |
+| /api/authors/* | PaperService | 5002 |
+| /api/keywords/* | PaperService | 5002 |
+| /api/topics/* | PaperService | 5002 |
+| /api/bookmarks/* | PaperService | 5002 |
+| /api/trends/* | TrendService | 5003 |
+| /api/dashboard/* | TrendService | 5003 |
+| /api/reports/* | TrendService | 5003 |
+| /api/notifications/* | NotificationService | 5004 |
+| /api/follows/* | NotificationService | 5004 |
+| /api/sync/* | SyncService | 5005 |
+| /api/datasources/* | SyncService | 5005 |
+
+Gateway health: GET /api/health
