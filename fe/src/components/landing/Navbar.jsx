@@ -33,6 +33,12 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3">
           <Link
+            to="/papers"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-primary transition-colors hover:text-accent-glow"
+          >
+            Papers
+          </Link>
+          <Link
             to="/login"
             className="rounded-lg px-4 py-2 text-sm font-medium text-primary transition-colors hover:text-accent-glow"
           >
