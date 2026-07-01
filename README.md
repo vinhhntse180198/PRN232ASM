@@ -41,6 +41,29 @@ PRN232ASM/
 
 ## Chạy local
 
+Cấu hình `.env` (bắt buộc)
+
+- Backend dùng file `be/.env` (không commit).
+- Frontend dùng file `fe/.env` (không commit).
+
+### Backend: `be/.env`
+
+Tạo file `be/.env` theo mẫu `be/.env.example` (nếu chưa có thì tạo mới dựa trên nội dung đang dùng local). Các biến quan trọng:
+
+- **DB**: `ConnectionStrings__DefaultConnection`
+- **JWT**: `JWT__Secret`, `JWT__Issuer`, `JWT__Audience`, `JWT__AccessTokenExpirationMinutes`
+- **OpenAlex** (tuỳ chọn / có thể tắt): `OpenAlex__Enabled=false`
+- **PaperService URL** (để SyncService import): `PaperService__BaseUrl=http://localhost:5002`
+
+### Frontend: `fe/.env`
+
+Copy từ `fe/.env.example` → `fe/.env`. Các biến quan trọng:
+
+- **Auth API**: `VITE_API_URL=http://localhost:5131`
+- **Paper API**: `VITE_PAPER_API_URL=http://localhost:5002`
+- **Trend API**: `VITE_TREND_API_URL=http://localhost:5003` (hoặc để trống để dùng Vite proxy `/api/trends`)
+- **Tắt OpenAlex (free-only)**: `VITE_OPENALEX_ENABLED=false`
+
 Cần **3 terminal** để trang Papers hoạt động đầy đủ:
 
 ```bash
