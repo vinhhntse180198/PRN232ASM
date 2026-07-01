@@ -1,0 +1,68 @@
+using PaperService.Application.Interfaces;
+using PaperService.Application.Settings;
+using PaperService.Infrastructure;
+using PaperService.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using PRN232ASM.Shared;
+using System.Text;
+
+var envPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", ".env"));
+if (File.Exists(envPath)) DotNetEnv.Env.Load(envPath);
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
+
+if (SupabaseConnectionHelper.UseSupabaseDatabase())
+{
+    var cs = SupabaseConnectionHelper.Build(builder.Configuration, PaperDbContext.Schema);
+    if (!string.IsNullOrEmpty(cs))
+        builder.Configuration["ConnectionStrings:DefaultConnection"] = cs;
+}
+else if (builder.Environment.IsDevelopment())
+    builder.Configuration["ConnectionStrings:DefaultConnection"] = "Data Source=paper.db";
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+var jwt = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
+    ?? throw new InvalidOperationException("JWT settings are not configured.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
+{
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwt.Issuer,
+        ValidAudience = jwt.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Secret))
+    };
+});
+builder.Services.AddAuthorization();
+builder.Services.AddCors(o => o.AddPolicy("Frontend", p => p.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173").AllowAnyHeader().AllowAnyMethod()));
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PaperDbContext>();
+    if (!SupabaseConnectionHelper.UseSupabaseDatabase())
+    {
+        await PaperService.Api.PaperDataSeeder.EnsureSqliteSchemaAsync(db);
+        await db.Database.EnsureCreatedAsync();
+        var paperService = scope.ServiceProvider.GetRequiredService<IPaperService>();
+        await PaperService.Api.PaperDataSeeder.SeedAsync(db, paperService);
+    }
+}
+
+if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
+app.UseCors("Frontend");
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();

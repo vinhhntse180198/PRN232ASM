@@ -41,14 +41,24 @@ PRN232ASM/
 
 ## Chạy local
 
+Cần **3 terminal** để trang Papers hoạt động đầy đủ:
+
 ```bash
-# Frontend
+# Terminal 1 — AuthService (port 5131)
+cd be/Services/AuthService/AuthService.Api
+dotnet run
+
+# Terminal 2 — SyncService (port 5005) — bắt buộc cho danh sách / tìm kiếm OpenAlex
+cd be/Services/SyncService/SyncService.Api
+dotnet run
+
+# Terminal 3 — Frontend (port 5173)
 cd fe
 npm install
 npm run dev
-
-# Backend — từng service trong be/Services/...
 ```
+
+Sau khi sửa code SyncService, **restart** terminal 2 (`Ctrl+C` rồi `dotnet run` lại).
 
 ## Mỗi service gồm 4 layers
 

@@ -1,60 +1,54 @@
-import { Handshake, Search, UserCircle } from 'lucide-react'
+import { Bookmark, BookOpen, Search } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const steps = [
   {
     num: '01',
-    icon: UserCircle,
-    title: 'Create Your Agency Profile',
-    desc: 'Showcase your skills, portfolio, and ideal partner criteria in minutes.',
-    preview: (
-      <div className="mt-4 rounded-lg border border-border bg-base/60 p-3">
-        <p className="text-xs font-semibold text-primary">Pixel & Co.</p>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {['Branding', 'Web', 'SEO'].map((t) => (
-            <span key={t} className="rounded-full bg-accent-primary/10 px-2 py-0.5 text-[10px] text-accent-glow">
-              {t}
-            </span>
-          ))}
-        </div>
-        <p className="mt-2 text-[10px] text-accent-amber">★ 4.9 rating · 120 projects</p>
-      </div>
-    ),
-  },
-  {
-    num: '02',
     icon: Search,
-    title: 'AI-Powered Smart Matching',
-    desc: 'Our engine surfaces partners with the highest fit for your pipeline.',
+    title: 'Search & Filter',
+    desc: 'Query OpenAlex by keyword and year. Filter free or paid papers instantly.',
     preview: (
       <div className="mt-4 space-y-2 rounded-lg border border-border bg-base/60 p-3">
-        <div className="rounded-md bg-elevated px-2 py-1.5 text-[10px] text-muted">Search: "UI agency + fintech"</div>
+        <div className="rounded-md bg-elevated px-2 py-1.5 text-[10px] text-muted">machine learning · 2024</div>
         {[
-          { name: 'Studio Arc', match: 96 },
-          { name: 'Northline', match: 91 },
-          { name: 'Forma Labs', match: 87 },
+          { name: 'Deep Learning Survey', match: 'Free' },
+          { name: 'Neural Networks Review', match: 'PDF' },
+          { name: 'AI in Medicine', match: 'Paid' },
         ].map((r) => (
           <div key={r.name} className="flex items-center justify-between text-[10px]">
             <span className="text-primary">{r.name}</span>
-            <span className="font-mono text-accent-green">{r.match}% match</span>
+            <span className="font-mono text-accent-green">{r.match}</span>
           </div>
         ))}
       </div>
     ),
   },
   {
+    num: '02',
+    icon: BookOpen,
+    title: 'Read In-App',
+    desc: 'Open abstracts and full-text PDFs in a clean reader with metadata sidebars.',
+    preview: (
+      <div className="mt-4 rounded-lg border border-border bg-base/60 p-3">
+        <p className="text-xs font-semibold text-primary">Abstract · Full Text</p>
+        <div className="mt-2 h-16 rounded bg-elevated/80" />
+        <p className="mt-2 text-[10px] text-muted">PDF viewer · Citation widgets</p>
+      </div>
+    ),
+  },
+  {
     num: '03',
-    icon: Handshake,
-    title: 'Collaborate & Close Deals',
-    desc: 'Manage discovery, proposals, and wins in one shared workspace.',
+    icon: Bookmark,
+    title: 'Save & Track',
+    desc: 'Bookmark papers to your library and monitor citations and topics.',
     preview: (
       <div className="mt-4 grid grid-cols-3 gap-1.5">
-        {['Discovery', 'Proposal', 'Won'].map((col, i) => (
+        {['Saved', 'Reading', 'Done'].map((col, i) => (
           <div key={col} className="rounded-lg border border-border bg-base/60 p-2">
             <p className="text-[9px] font-semibold text-muted">{col}</p>
-            {i === 2 && (
-              <div className="mt-1 rounded bg-accent-green/15 px-1 py-0.5 text-[9px] text-accent-green">
-                $24.5k
+            {i === 0 && (
+              <div className="mt-1 rounded bg-accent-primary/15 px-1 py-0.5 text-[9px] text-accent-glow">
+                18 papers
               </div>
             )}
           </div>
@@ -66,12 +60,12 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8">
+    <section className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <p className="text-center text-sm font-medium text-accent-glow">How It Works</p>
           <h2 className="mt-2 text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Three Steps to Growth
+            Three Steps to Smarter Reading
           </h2>
         </ScrollReveal>
 

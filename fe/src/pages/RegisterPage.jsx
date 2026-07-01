@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
-import { registerUser } from '../services/authService'
+import { registerUser, saveUserSession } from '../services/authService'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -22,16 +22,13 @@ export default function RegisterPage() {
       setError('Passwords do not match')
       return
     }
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters')
-      return
-    }
-
     setLoading(true)
     try {
       const result = await registerUser({ fullName, email, password })
       if (result.data?.accessToken) {
-        localStorage.setItem('accessToken', result.data.accessToken)
+        saveUserSession(result)
+        navigate('/papers')
+        return
       }
       navigate('/login')
     } catch (err) {
@@ -44,7 +41,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="Start free today"
-      subtitle="Create your agency account on Collective OS"
+      subtitle="Create your account on Scientific Paper Trend Tracker"
     >
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {error && (
@@ -78,7 +75,7 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@agency.com"
+            placeholder="you@university.edu"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>
@@ -94,7 +91,7 @@ export default function RegisterPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min. 8 characters"
+              placeholder="Enter password"
               className="w-full rounded-xl border border-border bg-elevated px-4 py-3 pr-11 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
             />
             <button

@@ -1,22 +1,22 @@
-import { BarChart2, Globe, Network, Shield, Zap, Target } from 'lucide-react'
+import { BarChart2, BookOpen, Bookmark, Globe, Search, Zap } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const features = [
-  { icon: Shield, title: 'Vetted Network', desc: 'Every partner is verified for quality, reliability, and track record.' },
-  { icon: BarChart2, title: 'Revenue Tracking', desc: 'Monitor pipeline value, win rates, and partner ROI in real time.' },
-  { icon: Globe, title: 'Global Reach', desc: 'Access agencies across 41 countries without opening new offices.' },
-  { icon: Zap, title: 'Lightning Fast', desc: 'Match with qualified partners in hours, not months of outreach.' },
-  { icon: Target, title: 'Smart Matching', desc: 'AI scores fit based on skills, industry, and deal history.' },
-  { icon: Network, title: 'Deep Analytics', desc: 'Insights on partner performance, trends, and growth opportunities.' },
+  { icon: Search, title: 'Smart Search', desc: 'Find papers by topic, author, or year with OpenAlex-powered search.' },
+  { icon: BookOpen, title: 'In-App Reader', desc: 'Read open-access PDFs and abstracts without leaving the platform.' },
+  { icon: Bookmark, title: 'Bookmarks', desc: 'Save papers to your library and revisit them anytime.' },
+  { icon: Globe, title: 'Open Access', desc: 'Browse free papers or filter paywalled works with clear labels.' },
+  { icon: Zap, title: 'Fast Discovery', desc: 'Surface relevant works in seconds with year and access filters.' },
+  { icon: BarChart2, title: 'Citation Insights', desc: 'View citation counts, topics, and publication metadata at a glance.' },
 ]
 
 export default function FeaturesGrid() {
   return (
-    <section className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Why Agencies Choose Us
+            Built for Research Workflows
           </h2>
         </ScrollReveal>
 

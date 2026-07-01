@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
+import { APP_NAME } from '../../config/app'
 
 const footerLinks = {
-  Product: ['Features', 'Partners', 'Pricing', 'Integrations'],
-  Resources: ['Blog', 'Case Studies', 'Help Center', 'API Docs'],
-  Company: ['About', 'Careers', 'Contact', 'Privacy'],
+  Product: ['Search Papers', 'Read PDF', 'Bookmarks', 'Trends'],
+  Resources: ['OpenAlex', 'Help Center', 'API', 'Docs'],
+  Company: ['About', 'Contact', 'Privacy', 'Terms'],
 }
 
 export default function Footer() {
@@ -12,11 +13,11 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold text-primary">
-            Collective OS
+            {APP_NAME}
             <span className="h-2 w-2 rounded-full bg-accent-primary" />
           </Link>
-          <p className="mt-3 text-sm leading-relaxed text-muted">
-            Connect agencies with vetted partners to expand services and grow revenue.
+          <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-300">
+            Search, read, and track scientific publications from open-access sources worldwide.
           </p>
         </div>
 
@@ -38,7 +39,7 @@ export default function Footer() {
 
       <div className="mx-auto mt-12 max-w-7xl border-t border-border pt-8">
         <p className="text-center text-xs text-muted">
-          © {new Date().getFullYear()} Collective OS. All rights reserved.
+          © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </p>
       </div>
     </footer>

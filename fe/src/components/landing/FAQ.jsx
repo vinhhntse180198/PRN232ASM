@@ -1,27 +1,28 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import ScrollReveal from '../ui/ScrollReveal'
+import { APP_NAME } from '../../config/app'
 
 const faqs = [
   {
-    q: 'How does Collective OS match agencies?',
-    a: 'Our AI analyzes your agency profile, skills, industry focus, and deal history to surface partners with the highest compatibility score. Matches are ranked by fit, availability, and past collaboration success.',
+    q: `What is ${APP_NAME}?`,
+    a: 'A research platform that lets you search scholarly papers via OpenAlex, read open-access PDFs in the browser, save bookmarks, and explore citation metadata.',
   },
   {
     q: 'Is there a free plan available?',
-    a: 'Yes. Start free with up to 5 partner matches per month, basic analytics, and access to our vetted network. Upgrade anytime for unlimited matching and advanced pipeline tools.',
+    a: 'Yes. Create a free account to search papers, browse open-access works, read PDFs in-app, and save bookmarks to your personal library.',
   },
   {
-    q: 'How long does it take to find a partner?',
-    a: 'Most agencies receive their first qualified matches within 24 hours of completing their profile. High-priority matches often surface in under 4 hours.',
+    q: 'Where does the paper data come from?',
+    a: 'We integrate with OpenAlex and other open scholarly sources. Free papers with full text can be read directly; paywalled works link to the publisher.',
   },
   {
-    q: 'What types of agencies use Collective OS?',
-    a: 'Branding, web development, SEO, content, video, and full-service digital agencies across B2B and B2C. We support boutiques to 200+ person teams.',
+    q: 'Can I read PDFs without leaving the app?',
+    a: 'Yes. Open-access papers with a PDF are proxied for in-app reading. You can also download PDFs or open the publisher page when needed.',
   },
   {
-    q: 'Can I manage deals directly on the platform?',
-    a: 'Absolutely. Track opportunities from discovery through proposal to won — with shared workspaces, messaging, and revenue reporting built in.',
+    q: 'How do bookmarks work?',
+    a: 'Save any paper to your library from search results or the reader view. Access saved papers anytime from the Bookmarks page.',
   },
 ]
 
@@ -31,9 +32,9 @@ function FaqItem({ item, open, onToggle }) {
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 py-5 text-left"
+        className="flex w-full items-center justify-between gap-4 py-5 text-left text-primary"
       >
-        <span className="text-sm font-medium text-primary sm:text-base">{item.q}</span>
+        <span className="text-sm font-bold sm:text-base">{item.q}</span>
         <ChevronDown
           className={`h-5 w-5 shrink-0 text-muted transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
         />
@@ -42,7 +43,7 @@ function FaqItem({ item, open, onToggle }) {
         className="overflow-hidden transition-all duration-300 ease-in-out"
         style={{ maxHeight: open ? '200px' : '0' }}
       >
-        <p className="pb-5 text-sm leading-relaxed text-muted">{item.a}</p>
+        <p className="pb-5 text-sm font-semibold leading-relaxed text-muted">{item.a}</p>
       </div>
     </div>
   )
@@ -52,7 +53,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
-    <section className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id="faq" className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">

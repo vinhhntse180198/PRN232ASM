@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { APP_NAME, APP_SHORT_NAME } from '../../config/app'
 
 export default function AuthLayout({ children, title, subtitle }) {
   return (
@@ -7,9 +8,10 @@ export default function AuthLayout({ children, title, subtitle }) {
       <div className="pointer-events-none absolute left-1/2 top-1/4 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-halo" />
 
       <div className="relative w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center gap-2 font-display text-xl font-bold text-primary">
-          Collective OS
-          <span className="h-2 w-2 rounded-full bg-accent-primary shadow-glow-sm" />
+        <Link to="/" className="mb-8 flex items-center justify-center gap-2 text-center font-display text-lg font-bold text-primary sm:text-xl">
+          <span className="hidden sm:inline">{APP_NAME}</span>
+          <span className="sm:hidden">{APP_SHORT_NAME}</span>
+          <span className="h-2 w-2 shrink-0 rounded-full bg-accent-primary shadow-glow-sm" />
         </Link>
 
         <div className="rounded-2xl border border-border bg-surface p-8 shadow-glow-sm">

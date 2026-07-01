@@ -58,3 +58,10 @@ dist/
 
 # Supabase
 .supabase/
+
+# Local SQLite database (AuthService dev)
+auth.db
+paper.db
+trend.db
+notify.db
+sync.db

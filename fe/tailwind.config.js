@@ -4,22 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: '#080C14',
-        surface: '#0F1623',
-        elevated: '#1A2235',
+        base: 'rgb(var(--c-base) / <alpha-value>)',
+        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+        elevated: 'rgb(var(--c-elevated) / <alpha-value>)',
         accent: {
-          primary: '#6366F1',
-          glow: '#818CF8',
-          green: '#10B981',
-          amber: '#F59E0B',
+          primary: 'rgb(var(--c-accent-primary) / <alpha-value>)',
+          glow: 'rgb(var(--c-accent-glow) / <alpha-value>)',
+          green: 'rgb(var(--c-accent-green) / <alpha-value>)',
+          amber: 'rgb(var(--c-accent-amber) / <alpha-value>)',
         },
-        primary: '#F1F5F9',
-        muted: '#64748B',
-        border: '#1E293B',
+        primary: 'rgb(var(--c-primary) / <alpha-value>)',
+        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+        border: 'rgb(var(--c-border) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         display: ['"DM Sans"', 'Inter', 'sans-serif'],
+        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
@@ -38,7 +39,7 @@ export default {
       },
       backgroundImage: {
         'hero-gradient': 'linear-gradient(135deg, #6366F1 0%, #A78BFA 100%)',
-        'cta-gradient': 'linear-gradient(135deg, #312E81 0%, #1E1B4B 50%, #080C14 100%)',
+        'cta-gradient': 'linear-gradient(135deg, #312E81 0%, #1E1B4B 50%, #0A0B1E 100%)',
         'halo': 'radial-gradient(ellipse at center, rgba(99,102,241,0.15) 0%, transparent 70%)',
       },
     },

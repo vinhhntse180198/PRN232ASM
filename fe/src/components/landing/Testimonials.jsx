@@ -2,21 +2,21 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const testimonials = [
   {
-    quote: 'Collective OS helped us close $180k in partner-sourced deals in our first quarter. The matching is eerily accurate.',
+    quote: 'I can search OpenAlex and read PDFs without jumping between tabs. Bookmarks keep my literature review organized.',
     name: 'Sarah Chen',
-    role: 'Founder, Pixel & Co.',
+    role: 'PhD Researcher, Public Health',
     initials: 'SC',
   },
   {
-    quote: 'We expanded into video production without hiring a single editor. Our partners feel like an extension of our team.',
+    quote: 'The in-app reader and citation widgets save hours every week when screening papers for my thesis.',
     name: 'Marcus Webb',
-    role: 'CEO, Northline Agency',
+    role: 'Graduate Student, Computer Science',
     initials: 'MW',
   },
   {
-    quote: 'The dashboard alone paid for itself. We finally have visibility into which partnerships actually drive revenue.',
+    quote: 'Filtering free vs paid papers and browsing by year makes it easy to build a focused reading list.',
     name: 'Elena Rossi',
-    role: 'COO, Forma Labs',
+    role: 'Research Assistant, Biology',
     initials: 'ER',
   },
 ]
@@ -27,9 +27,9 @@ export default function Testimonials() {
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Loved by Agencies Worldwide
+            Trusted by Researchers
           </h2>
-          <p className="mt-2 text-center text-sm text-muted">2,000+ agency founders</p>
+          <p className="mt-2 text-center text-sm text-muted">Students & academics worldwide</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
-import { loginUser } from '../services/authService'
+import { loginUser, saveUserSession } from '../services/authService'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -19,10 +19,8 @@ export default function LoginPage() {
 
     try {
       const result = await loginUser({ email, password })
-      if (result.data?.accessToken) {
-        localStorage.setItem('accessToken', result.data.accessToken)
-      }
-      navigate('/')
+      saveUserSession(result)
+      navigate('/papers')
     } catch (err) {
       setError(err.message || 'Invalid email or password')
     } finally {
@@ -33,12 +31,21 @@ export default function LoginPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to your Collective OS account"
+      subtitle="Sign in to Scientific Paper Trend Tracker"
     >
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {error && (
           <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {error}
+            <p>{error}</p>
+            {error.toLowerCase().includes('invalid') && (
+              <p className="mt-2 text-xs text-muted">
+                Chưa có tài khoản?{' '}
+                <Link to="/register" className="text-accent-glow hover:underline">
+                  Đăng ký tại đây
+                </Link>
+                {' '}hoặc dùng tài khoản demo: <span className="font-mono text-primary">user@gmail.com</span> / <span className="font-mono text-primary">123456</span>
+              </p>
+            )}
           </div>
         )}
 
@@ -52,7 +59,7 @@ export default function LoginPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@agency.com"
+            placeholder="you@university.edu"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>

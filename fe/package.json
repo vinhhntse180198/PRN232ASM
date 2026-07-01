@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "sync": "dotnet run --project ../be/Services/SyncService/SyncService.Api/SyncService.Api.csproj",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -12,6 +13,7 @@
   "dependencies": {
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.21.0",
+    "recharts": "^3.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.18.0"

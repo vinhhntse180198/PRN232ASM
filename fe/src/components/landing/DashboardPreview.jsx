@@ -1,45 +1,44 @@
 import {
   BarChart3,
-  Briefcase,
+  Bookmark,
+  BookOpen,
   LayoutDashboard,
-  MessageSquare,
-  Sparkles,
-  Users,
+  Search,
+  TrendingUp,
 } from 'lucide-react'
 import { useCountUp } from '../../hooks/useCountUp'
 import ScrollReveal from '../ui/ScrollReveal'
+import { APP_SHORT_NAME } from '../../config/app'
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Overview', active: true },
-  { icon: Users, label: 'Partners' },
-  { icon: Briefcase, label: 'Projects' },
-  { icon: MessageSquare, label: 'Messages' },
+  { icon: LayoutDashboard, label: 'Papers', active: true },
+  { icon: Search, label: 'Search' },
+  { icon: Bookmark, label: 'Bookmarks' },
+  { icon: TrendingUp, label: 'Trends' },
   { icon: BarChart3, label: 'Analytics' },
 ]
 
 const stats = [
-  { label: 'Total Revenue', value: 284500, prefix: '$', suffix: '', change: '+12.5%', positive: true },
-  { label: 'Active Partners', value: 500, suffix: 'k', change: '+8.1%', positive: true, format: 'k' },
-  { label: 'Open Opportunities', value: 23, suffix: '', change: '-2%', positive: false },
-  { label: 'Win Rate', value: 88, suffix: '%', change: '+4.2%', positive: true },
+  { label: 'Papers in Library', value: 303, suffix: '', change: '+24', positive: true },
+  { label: 'Open Access', value: 186, suffix: '', change: '+12%', positive: true },
+  { label: 'Bookmarks', value: 18, suffix: '', change: '+3', positive: true },
+  { label: 'Avg. Citations', value: 12, suffix: '', change: '+4.2%', positive: true },
 ]
 
-const opportunities = [
-  { name: 'Brand Refresh — NovaTech', value: '$42,000', status: 'Proposal', priority: 'High' },
-  { name: 'SEO Sprint — Lumina', value: '$18,500', status: 'Discovery', priority: 'Medium' },
-  { name: 'App Redesign — Orbit', value: '$24,500', status: 'Won', priority: 'Won' },
+const recentPapers = [
+  { name: 'Intestinal Parasitic Infection…', value: '2024', status: 'Open Access', priority: 'Free' },
+  { name: 'Machine Learning in Healthcare', value: '2023', status: 'PDF', priority: 'Saved' },
+  { name: 'Climate Change Impact Study', value: '2022', status: 'Read', priority: 'Done' },
 ]
 
-function StatCard({ stat, index }) {
-  const displayValue = stat.format === 'k' ? stat.value : stat.value
-  const { ref, formatted } = useCountUp(displayValue, 1400)
+function StatCard({ stat }) {
+  const { ref, formatted } = useCountUp(stat.value, 1400)
 
   return (
     <div className="rounded-xl border border-border bg-base/60 p-4">
       <p className="text-xs text-muted">{stat.label}</p>
       <p ref={ref} className="mt-1 font-mono text-xl font-semibold text-primary">
-        {stat.prefix}
-        {stat.format === 'k' ? `${formatted}k` : stat.suffix === '%' ? `${formatted}%` : Number(formatted).toLocaleString()}
+        {Number(formatted).toLocaleString()}{stat.suffix}
       </p>
       <p className={`mt-1 text-xs font-medium ${stat.positive ? 'text-accent-green' : 'text-red-400'}`}>
         {stat.change}
@@ -57,10 +56,9 @@ export default function DashboardPreview() {
 
           <div className="animate-float relative overflow-hidden rounded-2xl border border-border bg-surface shadow-glow">
             <div className="flex min-h-[480px] flex-col md:flex-row">
-              {/* Sidebar */}
               <aside className="hidden w-52 shrink-0 border-r border-border bg-base/80 p-4 md:block">
                 <div className="mb-6 flex items-center gap-2 font-display text-sm font-bold text-primary">
-                  Collective OS
+                  {APP_SHORT_NAME}
                   <span className="h-1.5 w-1.5 rounded-full bg-accent-primary" />
                 </div>
                 <nav className="space-y-1">
@@ -80,36 +78,35 @@ export default function DashboardPreview() {
                 </nav>
               </aside>
 
-              {/* Main */}
               <div className="flex-1 p-4 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
                   <div>
-                    <p className="text-xs text-muted">Dashboard</p>
-                    <h3 className="font-display text-lg font-bold text-primary">Welcome back, Rahim</h3>
+                    <p className="text-xs text-muted">Library</p>
+                    <h3 className="font-display text-lg font-bold text-primary">Research Papers</h3>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       className="rounded-lg bg-accent-primary px-3 py-1.5 text-xs font-semibold text-white"
                     >
-                      New Deal
+                      Search
                     </button>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-elevated text-xs font-bold text-accent-glow">
-                      R
+                      T
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                  {stats.map((stat, i) => (
-                    <StatCard key={stat.label} stat={stat} index={i} />
+                  {stats.map((stat) => (
+                    <StatCard key={stat.label} stat={stat} />
                   ))}
                 </div>
 
                 <div className="mt-4 rounded-xl border border-border bg-base/40 p-4">
-                  <p className="mb-3 text-sm font-semibold text-primary">Recent Opportunities</p>
+                  <p className="mb-3 text-sm font-semibold text-primary">Recent Papers</p>
                   <div className="space-y-2">
-                    {opportunities.map((row) => (
+                    {recentPapers.map((row) => (
                       <div
                         key={row.name}
                         className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface/80 px-3 py-2 text-xs"
@@ -119,11 +116,11 @@ export default function DashboardPreview() {
                         <span className="rounded-full bg-elevated px-2 py-0.5 text-muted">{row.status}</span>
                         <span
                           className={`rounded-full px-2 py-0.5 ${
-                            row.priority === 'High'
-                              ? 'bg-accent-amber/15 text-accent-amber'
-                              : row.priority === 'Won'
-                                ? 'bg-accent-green/15 text-accent-green'
-                                : 'bg-accent-primary/10 text-accent-glow'
+                            row.priority === 'Free'
+                              ? 'bg-accent-green/15 text-accent-green'
+                              : row.priority === 'Done'
+                                ? 'bg-accent-primary/10 text-accent-glow'
+                                : 'bg-accent-amber/15 text-accent-amber'
                           }`}
                         >
                           {row.priority}
@@ -136,30 +133,19 @@ export default function DashboardPreview() {
             </div>
           </div>
 
-          {/* Floating cards */}
           <div className="absolute -bottom-6 -right-2 z-10 hidden rounded-xl border border-border bg-surface p-3 shadow-card sm:block lg:-right-8">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-accent-primary" />
+              <BookOpen className="h-4 w-4 text-accent-primary" />
               <div>
-                <p className="text-xs font-semibold text-primary">AI Matched</p>
-                <p className="text-[10px] text-muted">3 partners found</p>
+                <p className="text-xs font-semibold text-primary">PDF Ready</p>
+                <p className="text-[10px] text-muted">Read in-app</p>
               </div>
-            </div>
-            <div className="mt-2 flex -space-x-2">
-              {['A', 'B', 'C'].map((l) => (
-                <div
-                  key={l}
-                  className="flex h-6 w-6 items-center justify-center rounded-full border border-base bg-elevated text-[9px] font-bold text-accent-glow"
-                >
-                  {l}
-                </div>
-              ))}
             </div>
           </div>
 
           <div className="absolute -left-2 top-1/3 z-10 hidden rounded-xl border border-accent-green/30 bg-surface p-3 shadow-card sm:block lg:-left-10">
-            <p className="text-xs font-semibold text-accent-green">Deal won: $24,500</p>
-            <p className="mt-1 text-[10px] text-muted">🎉 Confetti sent to team</p>
+            <p className="text-xs font-semibold text-accent-green">Open Access found</p>
+            <p className="mt-1 text-[10px] text-muted">12 free papers this week</p>
           </div>
         </div>
       </ScrollReveal>
