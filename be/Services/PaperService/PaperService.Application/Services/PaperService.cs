@@ -166,6 +166,27 @@ public class PaperService : IPaperService
         return _mapper.Map<PaperDetailResponse>(paper);
     }
 
+    public async Task<bool> ImportAsync(ImportPaperRequest request, CancellationToken cancellationToken = default)
+    {
+        if (await _unitOfWork.ResearchPapers.ExistsByDoiOrTitleAsync(request.Doi, request.Title, cancellationToken))
+            return false;
+
+        await CreateAsync(new CreatePaperRequest
+        {
+            Title = request.Title,
+            Abstract = request.Abstract ?? string.Empty,
+            Doi = request.Doi ?? string.Empty,
+            PublicationYear = request.PublicationYear ?? 0,
+            CitationCount = request.CitationCount,
+            JournalName = string.IsNullOrWhiteSpace(request.JournalName) ? "Unknown" : request.JournalName,
+            Authors = request.AuthorNames,
+            Keywords = request.Keywords,
+            Topics = request.Topics
+        }, cancellationToken);
+
+        return true;
+    }
+
     public async Task<IReadOnlyList<AuthorResponse>> GetAuthorsAsync(CancellationToken cancellationToken = default)
     {
         var authors = await _unitOfWork.Authors.GetAllAsync(cancellationToken);

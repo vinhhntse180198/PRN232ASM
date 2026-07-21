@@ -26,3 +26,17 @@ public class BookmarkRequest
 {
     public Guid PaperId { get; set; }
 }
+
+public class ImportPaperRequest
+{
+    public string ExternalId { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string? Abstract { get; set; }
+    public int? PublicationYear { get; set; }
+    public string? Doi { get; set; }
+    public int CitationCount { get; set; }
+    public string? JournalName { get; set; }
+    public IReadOnlyList<string> AuthorNames { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> Keywords { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> Topics { get; set; } = Array.Empty<string>();
+}

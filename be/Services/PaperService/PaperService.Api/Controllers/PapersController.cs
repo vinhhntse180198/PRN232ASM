@@ -52,4 +52,16 @@ public class PapersController : ControllerBase
         var paper = await _paperService.CreateAsync(request, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = paper.Id }, ApiResponse<object>.Ok(paper));
     }
+
+    [HttpPost("import")]
+    public async Task<ActionResult<ApiResponse<object>>> Import(
+        [FromBody] ImportPaperRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var created = await _paperService.ImportAsync(request, cancellationToken);
+        if (!created)
+            return Conflict(ApiResponse.Fail("Paper already exists."));
+
+        return Ok(ApiResponse<object>.Ok(new { imported = true }));
+    }
 }
