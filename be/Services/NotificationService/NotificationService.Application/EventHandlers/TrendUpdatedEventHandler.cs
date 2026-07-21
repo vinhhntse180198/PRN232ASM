@@ -17,14 +17,28 @@ public class TrendUpdatedEventHandler : IIntegrationEventHandler<TrendUpdatedEve
 
     public async Task HandleAsync(TrendUpdatedEvent @event, CancellationToken cancellationToken = default)
     {
-        var followers = await _followRepository.GetFollowersByTopicIdAsync(@event.TopicId, cancellationToken);
+        var followerIds = new HashSet<Guid>();
 
-        foreach (var userId in followers)
+        if (@event.TopicId != Guid.Empty)
+        {
+            foreach (var id in await _followRepository.GetFollowersByTopicIdAsync(@event.TopicId, cancellationToken))
+                followerIds.Add(id);
+        }
+
+        if (@event.KeywordId != Guid.Empty)
+        {
+            foreach (var id in await _followRepository.GetFollowersByKeywordIdAsync(@event.KeywordId, cancellationToken))
+                followerIds.Add(id);
+        }
+
+        var label = string.IsNullOrWhiteSpace(@event.Keyword) ? @event.TopicName : @event.Keyword;
+
+        foreach (var userId in followerIds)
         {
             await _notificationService.CreateAsync(
                 userId,
                 "Trend update",
-                $"Topic \"{@event.TopicName}\" grew {Math.Round(@event.GrowthPercent, 1)}% in {@event.Period} ({@event.PaperCount} papers).",
+                $"\"{label}\" grew {Math.Round(@event.GrowthPercent, 1)}% in {@event.Period} ({@event.PaperCount} papers).",
                 "TrendUpdated",
                 cancellationToken);
         }
