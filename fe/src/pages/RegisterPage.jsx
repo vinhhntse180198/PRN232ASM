@@ -61,14 +61,14 @@ export default function RegisterPage() {
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Rahim Hassan"
+            placeholder="Nguyen Van A"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-primary">
-            Work email
+            Email
           </label>
           <input
             id="email"
@@ -76,7 +76,7 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@agency.com"
+            placeholder="you@university.edu"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>

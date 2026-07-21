@@ -4,24 +4,24 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const faqs = [
   {
-    q: 'How does Collective OS match agencies?',
-    a: 'Our AI analyzes your agency profile, skills, industry focus, and deal history to surface partners with the highest compatibility score. Matches are ranked by fit, availability, and past collaboration success.',
+    q: 'Where does the data come from?',
+    a: 'We use public metadata from free academic sources such as OpenAlex, Crossref, and Semantic Scholar — including titles, abstracts, keywords, publication year, authors, and journals.',
   },
   {
-    q: 'Is there a free plan available?',
-    a: 'Yes. Start free with up to 5 partner matches per month, basic analytics, and access to our vetted network. Upgrade anytime for unlimited matching and advanced pipeline tools.',
+    q: 'Is Paper Trend Tracker free to use?',
+    a: 'Yes. The platform is built on free, open academic APIs, so you can search papers and explore publication trends at no cost.',
   },
   {
-    q: 'How long does it take to find a partner?',
-    a: 'Most agencies receive their first qualified matches within 24 hours of completing their profile. High-priority matches often surface in under 4 hours.',
+    q: 'How are publication trends calculated?',
+    a: 'We aggregate the number of papers published per keyword and per topic across years, then visualize the change over time so you can see what is rising or fading.',
   },
   {
-    q: 'What types of agencies use Collective OS?',
-    a: 'Branding, web development, SEO, content, video, and full-service digital agencies across B2B and B2C. We support boutiques to 200+ person teams.',
+    q: 'Which research fields are covered?',
+    a: 'To keep results focused and fast, the system initially tracks selected domains such as Computer Science and Artificial Intelligence, with more fields added over time.',
   },
   {
-    q: 'Can I manage deals directly on the platform?',
-    a: 'Absolutely. Track opportunities from discovery through proposal to won — with shared workspaces, messaging, and revenue reporting built in.',
+    q: 'How often is the data updated?',
+    a: 'Data is synchronized on a periodic schedule (for example daily or weekly). It is not real-time, which keeps the dataset stable and consistent for analysis.',
   },
 ]
 
@@ -52,7 +52,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
-    <section className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id="faq" className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
