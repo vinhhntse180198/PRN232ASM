@@ -155,6 +155,9 @@ public class PaperService : IPaperService
             PublicationYear = paper.PublicationYear,
             TopicId = primaryTopic?.Id,
             TopicName = primaryTopic?.Name,
+            JournalId = journal.Id,
+            TopicIds = paper.PaperTopics.Select(pt => pt.TopicId).ToList(),
+            KeywordIds = paper.PaperKeywords.Select(pk => pk.KeywordId).ToList(),
             Keywords = paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
             Authors = paper.PaperAuthors.OrderBy(pa => pa.AuthorOrder).Select(pa => pa.Author.Name).ToList(),
             JournalName = journal.Name
