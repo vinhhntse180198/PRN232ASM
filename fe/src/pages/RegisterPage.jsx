@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
-import { registerUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const { register } = useAuth()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,11 +30,8 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      const result = await registerUser({ fullName, email, password })
-      if (result.data?.accessToken) {
-        localStorage.setItem('accessToken', result.data.accessToken)
-      }
-      navigate('/login')
+      await register(fullName, email, password)
+      navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.')
     } finally {
@@ -44,7 +42,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="Start free today"
-      subtitle="Create your agency account on Collective OS"
+      subtitle="Create your research account"
     >
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {error && (
