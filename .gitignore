@@ -56,5 +56,10 @@ Thumbs.db
 node_modules/
 dist/
 
+# Local SQLite DBs / Hangfire
+*.db
+*.db-shm
+*.db-wal
+
 # Supabase
 .supabase/

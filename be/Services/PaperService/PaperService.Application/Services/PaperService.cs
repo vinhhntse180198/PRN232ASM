@@ -1,216 +1,260 @@
-using Common.Exceptions;
-using Common.Models;
-using PaperService.Application.DTOs.Requests;
-using PaperService.Application.DTOs.Responses;
-using PaperService.Application.Interfaces;
-using PaperService.Domain.Entities;
+using AutoMapper;
+using PRN232ASM.BuildingBlocks.Common.Exceptions;
+using PRN232ASM.BuildingBlocks.Common.Models;
+using PRN232ASM.BuildingBlocks.Contracts.Papers;
+using PRN232ASM.PaperService.Application.DTOs.Requests;
+using PRN232ASM.PaperService.Application.DTOs.Responses;
+using PRN232ASM.PaperService.Application.Interfaces;
+using PRN232ASM.PaperService.Domain.Entities;
 
-namespace PaperService.Application.Services;
+namespace PRN232ASM.PaperService.Application.Services;
 
 public class PaperService : IPaperService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly IPaperEventPublisher _eventPublisher;
 
-    public PaperService(IUnitOfWork unitOfWork)
+    public PaperService(IUnitOfWork unitOfWork, IMapper mapper, IPaperEventPublisher eventPublisher)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _eventPublisher = eventPublisher;
     }
 
-    public async Task<PagedResult<PaperListItemResponse>> SearchAsync(
-        SearchPaperRequest request,
-        Guid? userId,
-        CancellationToken cancellationToken = default)
+    public async Task<PagedResult<PaperSummaryResponse>> SearchAsync(SearchPaperRequest request, CancellationToken cancellationToken = default)
     {
-        var page = request.Page < 1 ? 1 : request.Page;
-        var pageSize = request.PageSize is < 1 or > 50 ? 10 : request.PageSize;
+        var page = request.Page <= 0 ? 1 : request.Page;
+        var pageSize = request.PageSize <= 0 ? 20 : Math.Min(request.PageSize, 100);
 
-        var (items, totalCount) = await _unitOfWork.ResearchPapers.SearchAsync(
+        var result = await _unitOfWork.ResearchPapers.SearchAsync(
+            page,
+            pageSize,
             request.Keyword,
             request.Author,
             request.Journal,
-            request.TopicId,
-            page,
-            pageSize,
             cancellationToken);
 
-        HashSet<Guid> bookmarkedIds = [];
-        if (userId.HasValue && items.Count > 0)
+        return new PagedResult<PaperSummaryResponse>
         {
-            bookmarkedIds = await _unitOfWork.Bookmarks.GetBookmarkedPaperIdsAsync(
-                userId.Value,
-                items.Select(p => p.Id),
-                cancellationToken);
-        }
-
-        return new PagedResult<PaperListItemResponse>
-        {
-            Items = items.Select(p => MapListItem(p, bookmarkedIds.Contains(p.Id))).ToList(),
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = totalCount
+            Items = _mapper.Map<IReadOnlyList<PaperSummaryResponse>>(result.Items),
+            Page = result.Page,
+            PageSize = result.PageSize,
+            TotalCount = result.TotalCount
         };
     }
 
-    public async Task<PaperDetailResponse> GetDetailAsync(Guid id, Guid? userId, CancellationToken cancellationToken = default)
+    public async Task<PaperDetailResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var paper = await _unitOfWork.ResearchPapers.GetByIdWithDetailsAsync(id, cancellationToken)
-            ?? throw new NotFoundException($"Paper with id '{id}' was not found.");
+        var paper = await _unitOfWork.ResearchPapers.GetByIdAsync(id, cancellationToken)
+            ?? throw new NotFoundException(nameof(ResearchPaper), id);
 
-        var isBookmarked = false;
-        if (userId.HasValue)
+        return _mapper.Map<PaperDetailResponse>(paper);
+    }
+
+    public async Task<PaperDetailResponse> CreateAsync(CreatePaperRequest request, CancellationToken cancellationToken = default)
+    {
+        var journal = await _unitOfWork.Journals.GetByNameAsync(request.JournalName, cancellationToken);
+        if (journal is null)
         {
-            var bookmark = await _unitOfWork.Bookmarks.GetByUserAndPaperAsync(userId.Value, id, cancellationToken);
-            isBookmarked = bookmark is not null;
+            journal = new Journal
+            {
+                Id = Guid.NewGuid(),
+                Name = request.JournalName,
+                Issn = $"ISSN-{request.JournalName.GetHashCode():X8}",
+                Publisher = "Academic Press"
+            };
+            await _unitOfWork.Journals.AddAsync(journal, cancellationToken);
         }
 
-        return MapDetail(paper, isBookmarked);
-    }
-
-    public async Task<IReadOnlyList<JournalListItemResponse>> GetJournalsAsync(CancellationToken cancellationToken = default)
-    {
-        var journals = await _unitOfWork.Journals.GetAllAsync(cancellationToken);
-        return journals.Select(j => new JournalListItemResponse
-        {
-            Id = j.Id,
-            Name = j.Name,
-            Issn = j.Issn,
-            Publisher = j.Publisher,
-            PaperCount = j.Papers.Count
-        }).ToList();
-    }
-
-    public async Task<IReadOnlyList<KeywordListItemResponse>> GetKeywordsAsync(CancellationToken cancellationToken = default)
-    {
-        var keywords = await _unitOfWork.Keywords.GetAllAsync(cancellationToken);
-        return keywords.Select(k => new KeywordListItemResponse
-        {
-            Id = k.Id,
-            Name = k.Name,
-            PaperCount = k.PaperKeywords.Count
-        }).ToList();
-    }
-
-    public async Task<IReadOnlyList<TopicListItemResponse>> GetTopicsAsync(CancellationToken cancellationToken = default)
-    {
-        var topics = await _unitOfWork.ResearchTopics.GetAllAsync(cancellationToken);
-        return topics.Select(t => new TopicListItemResponse
-        {
-            Id = t.Id,
-            Name = t.Name,
-            Description = t.Description,
-            PaperCount = t.PaperTopics.Count
-        }).ToList();
-    }
-
-    public async Task<IReadOnlyList<AuthorSummaryResponse>> SearchAuthorsAsync(string query, CancellationToken cancellationToken = default)
-    {
-        if (string.IsNullOrWhiteSpace(query))
-            return [];
-
-        var authors = await _unitOfWork.Authors.SearchByNameAsync(query.Trim(), 10, cancellationToken);
-        return authors.Select(a => new AuthorSummaryResponse
-        {
-            Id = a.Id,
-            Name = a.Name,
-            Affiliation = a.Affiliation,
-            Order = 0
-        }).ToList();
-    }
-
-    public async Task<IReadOnlyList<BookmarkResponse>> GetBookmarksAsync(Guid userId, CancellationToken cancellationToken = default)
-    {
-        var bookmarks = await _unitOfWork.Bookmarks.GetByUserIdAsync(userId, cancellationToken);
-        return bookmarks.Select(b => new BookmarkResponse
-        {
-            Id = b.Id,
-            PaperId = b.PaperId,
-            Title = b.Paper.Title,
-            JournalName = b.Paper.Journal?.Name,
-            PublishedYear = b.Paper.PublishedYear,
-            CreatedAt = b.CreatedAt
-        }).ToList();
-    }
-
-    public async Task AddBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default)
-    {
-        var paper = await _unitOfWork.ResearchPapers.GetByIdWithDetailsAsync(paperId, cancellationToken)
-            ?? throw new NotFoundException($"Paper with id '{paperId}' was not found.");
-
-        var existing = await _unitOfWork.Bookmarks.GetByUserAndPaperAsync(userId, paperId, cancellationToken);
-        if (existing is not null)
-            throw new ValidationException("Paper is already bookmarked.");
-
-        await _unitOfWork.Bookmarks.AddAsync(new Bookmark
+        var paper = new ResearchPaper
         {
             Id = Guid.NewGuid(),
-            UserId = userId,
-            PaperId = paper.Id,
+            Title = request.Title,
+            Abstract = request.Abstract,
+            Doi = request.Doi,
+            PublicationYear = request.PublicationYear,
+            CitationCount = request.CitationCount,
+            JournalId = journal.Id,
+            Journal = journal,
             CreatedAt = DateTime.UtcNow
+        };
+
+        var authorOrder = 1;
+        foreach (var authorName in request.Authors.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var author = await _unitOfWork.Authors.GetByNameAsync(authorName, cancellationToken);
+            if (author is null)
+            {
+                author = new Author
+                {
+                    Id = Guid.NewGuid(),
+                    Name = authorName,
+                    Affiliation = "Research Institute"
+                };
+                await _unitOfWork.Authors.AddAsync(author, cancellationToken);
+            }
+
+            paper.PaperAuthors.Add(new PaperAuthor
+            {
+                PaperId = paper.Id,
+                AuthorId = author.Id,
+                AuthorOrder = authorOrder++,
+                Author = author
+            });
+        }
+
+        foreach (var keywordName in request.Keywords.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var keyword = await _unitOfWork.Keywords.GetByNameAsync(keywordName, cancellationToken);
+            if (keyword is null)
+            {
+                keyword = new Keyword { Id = Guid.NewGuid(), Name = keywordName };
+                await _unitOfWork.Keywords.AddAsync(keyword, cancellationToken);
+            }
+
+            paper.PaperKeywords.Add(new PaperKeyword
+            {
+                PaperId = paper.Id,
+                KeywordId = keyword.Id,
+                Keyword = keyword
+            });
+        }
+
+        ResearchTopic? primaryTopic = null;
+        foreach (var topicName in request.Topics.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var topic = await _unitOfWork.ResearchTopics.GetByNameAsync(topicName, cancellationToken);
+            if (topic is null)
+            {
+                topic = new ResearchTopic
+                {
+                    Id = Guid.NewGuid(),
+                    Name = topicName,
+                    Description = $"Research area: {topicName}"
+                };
+                await _unitOfWork.ResearchTopics.AddAsync(topic, cancellationToken);
+            }
+
+            primaryTopic ??= topic;
+            paper.PaperTopics.Add(new PaperTopic
+            {
+                PaperId = paper.Id,
+                TopicId = topic.Id,
+                Topic = topic
+            });
+        }
+
+        await _unitOfWork.ResearchPapers.AddAsync(paper, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _eventPublisher.PublishPaperCreatedAsync(new PaperCreatedEvent
+        {
+            PaperId = paper.Id,
+            Title = paper.Title,
+            PublicationYear = paper.PublicationYear,
+            TopicId = primaryTopic?.Id,
+            TopicName = primaryTopic?.Name,
+            JournalId = journal.Id,
+            TopicIds = paper.PaperTopics.Select(pt => pt.TopicId).ToList(),
+            KeywordIds = paper.PaperKeywords.Select(pk => pk.KeywordId).ToList(),
+            Keywords = paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
+            Authors = paper.PaperAuthors.OrderBy(pa => pa.AuthorOrder).Select(pa => pa.Author.Name).ToList(),
+            JournalName = journal.Name
         }, cancellationToken);
 
+        return _mapper.Map<PaperDetailResponse>(paper);
+    }
+
+    public async Task<bool> ImportAsync(ImportPaperRequest request, CancellationToken cancellationToken = default)
+    {
+        if (await _unitOfWork.ResearchPapers.ExistsByDoiOrTitleAsync(request.Doi, request.Title, cancellationToken))
+            return false;
+
+        await CreateAsync(new CreatePaperRequest
+        {
+            Title = request.Title,
+            Abstract = request.Abstract ?? string.Empty,
+            Doi = request.Doi ?? string.Empty,
+            PublicationYear = request.PublicationYear ?? 0,
+            CitationCount = request.CitationCount,
+            JournalName = string.IsNullOrWhiteSpace(request.JournalName) ? "Unknown" : request.JournalName,
+            Authors = request.AuthorNames,
+            Keywords = request.Keywords,
+            Topics = request.Topics
+        }, cancellationToken);
+
+        return true;
+    }
+
+    public async Task<IReadOnlyList<AuthorResponse>> GetAuthorsAsync(CancellationToken cancellationToken = default)
+    {
+        var authors = await _unitOfWork.Authors.GetAllAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<AuthorResponse>>(authors);
+    }
+
+    public async Task<IReadOnlyList<JournalResponse>> GetJournalsAsync(CancellationToken cancellationToken = default)
+    {
+        var journals = await _unitOfWork.Journals.GetAllAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<JournalResponse>>(journals);
+    }
+
+    public async Task<IReadOnlyList<KeywordResponse>> GetKeywordsAsync(CancellationToken cancellationToken = default)
+    {
+        var keywords = await _unitOfWork.Keywords.GetAllAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<KeywordResponse>>(keywords);
+    }
+
+    public async Task<IReadOnlyList<TopicResponse>> GetTopicsAsync(CancellationToken cancellationToken = default)
+    {
+        var topics = await _unitOfWork.ResearchTopics.GetAllAsync(cancellationToken);
+        return _mapper.Map<IReadOnlyList<TopicResponse>>(topics);
+    }
+
+    public async Task<BookmarkResponse> AddBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default)
+    {
+        _ = await _unitOfWork.ResearchPapers.GetByIdAsync(paperId, cancellationToken)
+            ?? throw new NotFoundException(nameof(ResearchPaper), paperId);
+
+        var existing = await _unitOfWork.Bookmarks.GetAsync(userId, paperId, cancellationToken);
+        if (existing is not null)
+        {
+            return _mapper.Map<BookmarkResponse>(existing);
+        }
+
+        var bookmark = new Bookmark
+        {
+            UserId = userId,
+            PaperId = paperId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _unitOfWork.Bookmarks.AddAsync(bookmark, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var saved = await _unitOfWork.Bookmarks.GetAsync(userId, paperId, cancellationToken)
+            ?? bookmark;
+
+        return _mapper.Map<BookmarkResponse>(saved);
     }
 
     public async Task RemoveBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default)
     {
-        var bookmark = await _unitOfWork.Bookmarks.GetByUserAndPaperAsync(userId, paperId, cancellationToken)
-            ?? throw new NotFoundException("Bookmark not found.");
+        var bookmark = await _unitOfWork.Bookmarks.GetAsync(userId, paperId, cancellationToken)
+            ?? throw new NotFoundException("Bookmark", $"{userId}:{paperId}");
 
-        _unitOfWork.Bookmarks.Remove(bookmark);
+        await _unitOfWork.Bookmarks.RemoveAsync(bookmark, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    private static PaperListItemResponse MapListItem(ResearchPaper paper, bool isBookmarked) =>
-        new()
-        {
-            Id = paper.Id,
-            Title = paper.Title,
-            Abstract = paper.Abstract,
-            Doi = paper.Doi,
-            PublishedYear = paper.PublishedYear,
-            CitationCount = paper.CitationCount,
-            JournalName = paper.Journal?.Name,
-            Authors = paper.PaperAuthors
-                .OrderBy(pa => pa.AuthorOrder)
-                .Select(pa => pa.Author.Name)
-                .ToList(),
-            Keywords = paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
-            IsBookmarked = isBookmarked
-        };
+    public async Task<IReadOnlyList<BookmarkResponse>> GetBookmarksAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var bookmarks = await _unitOfWork.Bookmarks.GetByUserAsync(userId, cancellationToken);
+        return _mapper.Map<IReadOnlyList<BookmarkResponse>>(bookmarks);
+    }
+}
 
-    private static PaperDetailResponse MapDetail(ResearchPaper paper, bool isBookmarked) =>
-        new()
-        {
-            Id = paper.Id,
-            Title = paper.Title,
-            Abstract = paper.Abstract,
-            Doi = paper.Doi,
-            PublishedYear = paper.PublishedYear,
-            PublishedDate = paper.PublishedDate,
-            CitationCount = paper.CitationCount,
-            Url = paper.Url,
-            IsBookmarked = isBookmarked,
-            Journal = paper.Journal is null ? null : new JournalSummaryResponse
-            {
-                Id = paper.Journal.Id,
-                Name = paper.Journal.Name,
-                Issn = paper.Journal.Issn,
-                Publisher = paper.Journal.Publisher
-            },
-            Authors = paper.PaperAuthors
-                .OrderBy(pa => pa.AuthorOrder)
-                .Select(pa => new AuthorSummaryResponse
-                {
-                    Id = pa.Author.Id,
-                    Name = pa.Author.Name,
-                    Affiliation = pa.Author.Affiliation,
-                    Order = pa.AuthorOrder
-                }).ToList(),
-            Keywords = paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
-            Topics = paper.PaperTopics.Select(pt => new TopicSummaryResponse
-            {
-                Id = pt.Topic.Id,
-                Name = pt.Topic.Name
-            }).ToList()
-        };
+public interface IPaperEventPublisher
+{
+    Task PublishPaperCreatedAsync(PaperCreatedEvent @event, CancellationToken cancellationToken = default);
 }

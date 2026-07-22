@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
-import { loginUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -19,12 +20,9 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await loginUser({ email, password })
-      if (result.data?.accessToken) {
-        localStorage.setItem('accessToken', result.data.accessToken)
-      }
-      const from = location.state?.from || '/papers'
-      navigate(from)
+      await login(email, password)
+      const redirect = location.state?.from?.pathname || '/dashboard'
+      navigate(redirect, { replace: true })
     } catch (err) {
       setError(err.message || 'Invalid email or password')
     } finally {
@@ -35,7 +33,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to track papers and bookmarks"
+      subtitle="Sign in to Scientific Paper Trend Tracker"
     >
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {error && (
@@ -54,7 +52,7 @@ export default function LoginPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@agency.com"
+            placeholder="you@university.edu"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>

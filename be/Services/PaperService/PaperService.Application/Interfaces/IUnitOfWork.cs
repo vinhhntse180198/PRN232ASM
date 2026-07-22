@@ -1,6 +1,6 @@
-using PaperService.Application.Interfaces.Repositories;
+using PRN232ASM.PaperService.Application.Interfaces.Repositories;
 
-namespace PaperService.Application.Interfaces;
+namespace PRN232ASM.PaperService.Application.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
@@ -10,6 +10,5 @@ public interface IUnitOfWork : IDisposable
     IKeywordRepository Keywords { get; }
     IResearchTopicRepository ResearchTopics { get; }
     IBookmarkRepository Bookmarks { get; }
-
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

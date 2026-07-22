@@ -1,8 +1,8 @@
-using PaperService.Application.Interfaces;
-using PaperService.Application.Interfaces.Repositories;
-using PaperService.Infrastructure.Persistence.Repositories;
+using PRN232ASM.PaperService.Application.Interfaces;
+using PRN232ASM.PaperService.Application.Interfaces.Repositories;
+using PRN232ASM.PaperService.Infrastructure.Persistence.Repositories;
 
-namespace PaperService.Infrastructure.Persistence;
+namespace PRN232ASM.PaperService.Infrastructure.Persistence;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -11,12 +11,12 @@ public class UnitOfWork : IUnitOfWork
     public UnitOfWork(PaperServiceDbContext context)
     {
         _context = context;
-        ResearchPapers = new ResearchPaperRepository(_context);
-        Authors = new AuthorRepository(_context);
-        Journals = new JournalRepository(_context);
-        Keywords = new KeywordRepository(_context);
-        ResearchTopics = new ResearchTopicRepository(_context);
-        Bookmarks = new BookmarkRepository(_context);
+        ResearchPapers = new ResearchPaperRepository(context);
+        Authors = new AuthorRepository(context);
+        Journals = new JournalRepository(context);
+        Keywords = new KeywordRepository(context);
+        ResearchTopics = new ResearchTopicRepository(context);
+        Bookmarks = new BookmarkRepository(context);
     }
 
     public IResearchPaperRepository ResearchPapers { get; }
@@ -26,8 +26,13 @@ public class UnitOfWork : IUnitOfWork
     public IResearchTopicRepository ResearchTopics { get; }
     public IBookmarkRepository Bookmarks { get; }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
-        _context.SaveChangesAsync(cancellationToken);
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.SaveChangesAsync(cancellationToken);
+    }
 
-    public void Dispose() => _context.Dispose();
+    public void Dispose()
+    {
+        _context.Dispose();
+    }
 }

@@ -1,10 +1,9 @@
-namespace PaperService.Domain.Entities;
+namespace PRN232ASM.PaperService.Domain.Entities;
 
 public class Keyword
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public ICollection<PaperKeyword> PaperKeywords { get; set; } = [];
+    public ICollection<PaperKeyword> PaperKeywords { get; set; } = new List<PaperKeyword>();
 }

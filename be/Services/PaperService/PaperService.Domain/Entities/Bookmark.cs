@@ -1,10 +1,10 @@
-namespace PaperService.Domain.Entities;
+namespace PRN232ASM.PaperService.Domain.Entities;
 
 public class Bookmark
 {
-    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public Guid PaperId { get; set; }
+    public DateTime CreatedAt { get; set; }
+
     public ResearchPaper Paper { get; set; } = null!;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -1,4 +1,4 @@
-namespace PaperService.Domain.Entities;
+namespace PRN232ASM.PaperService.Domain.Entities;
 
 public class Author
 {
@@ -6,9 +6,6 @@ public class Author
     public string Name { get; set; } = string.Empty;
     public string? Affiliation { get; set; }
     public string? Email { get; set; }
-    public string? Orcid { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public ICollection<PaperAuthor> PaperAuthors { get; set; } = [];
+    public ICollection<PaperAuthor> PaperAuthors { get; set; } = new List<PaperAuthor>();
 }

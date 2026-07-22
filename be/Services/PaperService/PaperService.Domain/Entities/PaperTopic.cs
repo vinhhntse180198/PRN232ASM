@@ -1,9 +1,10 @@
-namespace PaperService.Domain.Entities;
+namespace PRN232ASM.PaperService.Domain.Entities;
 
 public class PaperTopic
 {
     public Guid PaperId { get; set; }
-    public ResearchPaper Paper { get; set; } = null!;
     public Guid TopicId { get; set; }
+
+    public ResearchPaper Paper { get; set; } = null!;
     public ResearchTopic Topic { get; set; } = null!;
 }

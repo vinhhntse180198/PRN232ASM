@@ -1,88 +1,56 @@
-namespace PaperService.Application.DTOs.Responses;
+namespace PRN232ASM.PaperService.Application.DTOs.Responses;
 
-public class PaperListItemResponse
+public class PaperSummaryResponse
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string? Abstract { get; set; }
-    public string? Doi { get; set; }
-    public short? PublishedYear { get; set; }
+    public string Abstract { get; set; } = string.Empty;
+    public string Doi { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
     public int CitationCount { get; set; }
-    public string? JournalName { get; set; }
-    public IReadOnlyList<string> Authors { get; set; } = [];
-    public IReadOnlyList<string> Keywords { get; set; } = [];
-    public bool IsBookmarked { get; set; }
+    public string JournalName { get; set; } = string.Empty;
+    public IReadOnlyList<string> Authors { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> Keywords { get; set; } = Array.Empty<string>();
 }
 
-public class PaperDetailResponse
+public class PaperDetailResponse : PaperSummaryResponse
 {
-    public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string? Abstract { get; set; }
-    public string? Doi { get; set; }
-    public short? PublishedYear { get; set; }
-    public DateOnly? PublishedDate { get; set; }
-    public int CitationCount { get; set; }
-    public string? Url { get; set; }
-    public JournalSummaryResponse? Journal { get; set; }
-    public IReadOnlyList<AuthorSummaryResponse> Authors { get; set; } = [];
-    public IReadOnlyList<string> Keywords { get; set; } = [];
-    public IReadOnlyList<TopicSummaryResponse> Topics { get; set; } = [];
-    public bool IsBookmarked { get; set; }
+    public IReadOnlyList<string> Topics { get; set; } = Array.Empty<string>();
+    public DateTime CreatedAt { get; set; }
 }
 
-public class JournalSummaryResponse
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string? Issn { get; set; }
-    public string? Publisher { get; set; }
-}
-
-public class AuthorSummaryResponse
+public class AuthorResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Affiliation { get; set; }
-    public short Order { get; set; }
 }
 
-public class TopicSummaryResponse
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-}
-
-public class JournalListItemResponse
+public class JournalResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Issn { get; set; }
     public string? Publisher { get; set; }
-    public int PaperCount { get; set; }
 }
 
-public class KeywordListItemResponse
+public class KeywordResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public int PaperCount { get; set; }
 }
 
-public class TopicListItemResponse
+public class TopicResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public int PaperCount { get; set; }
 }
 
 public class BookmarkResponse
 {
-    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
     public Guid PaperId { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string? JournalName { get; set; }
-    public short? PublishedYear { get; set; }
+    public string PaperTitle { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 }

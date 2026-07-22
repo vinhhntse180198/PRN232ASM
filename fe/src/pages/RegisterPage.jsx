@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
-import { registerUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const { register } = useAuth()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,11 +30,8 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      const result = await registerUser({ fullName, email, password })
-      if (result.data?.accessToken) {
-        localStorage.setItem('accessToken', result.data.accessToken)
-      }
-      navigate('/login')
+      await register(fullName, email, password)
+      navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.')
     } finally {
@@ -44,7 +42,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="Start free today"
-      subtitle="Create your agency account on Collective OS"
+      subtitle="Create your research account"
     >
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {error && (
@@ -63,14 +61,14 @@ export default function RegisterPage() {
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Rahim Hassan"
+            placeholder="Nguyen Van A"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-primary">
-            Work email
+            Email
           </label>
           <input
             id="email"
@@ -78,7 +76,7 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@agency.com"
+            placeholder="you@university.edu"
             className="mt-2 w-full rounded-xl border border-border bg-elevated px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30"
           />
         </div>

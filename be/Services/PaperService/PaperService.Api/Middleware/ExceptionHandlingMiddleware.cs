@@ -1,15 +1,20 @@
 using System.Net;
 using System.Text.Json;
-using Common.Exceptions;
-using Common.Models;
+using PRN232ASM.BuildingBlocks.Common.Exceptions;
+using PRN232ASM.BuildingBlocks.Common.Models;
 
-namespace PaperService.Api.Middleware;
+namespace PRN232ASM.PaperService.Api.Middleware;
 
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next) => _next = next;
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -19,6 +24,7 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unhandled exception");
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -27,15 +33,17 @@ public class ExceptionHandlingMiddleware
     {
         var (statusCode, message) = exception switch
         {
-            NotFoundException => (HttpStatusCode.NotFound, exception.Message),
-            ValidationException => (HttpStatusCode.BadRequest, exception.Message),
+            NotFoundException notFound => (HttpStatusCode.NotFound, notFound.Message),
+            ValidationException validation => (HttpStatusCode.BadRequest, validation.Message),
+            ArgumentException argument => (HttpStatusCode.BadRequest, argument.Message),
+            UnauthorizedAccessException unauthorized => (HttpStatusCode.Unauthorized, unauthorized.Message),
             _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
         };
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        var response = ApiResponse<object>.Fail(message);
+        var response = ApiResponse.Fail(message);
         return context.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
 }

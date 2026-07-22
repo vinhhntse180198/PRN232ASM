@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 
 const footerLinks = {
-  Product: ['Features', 'Partners', 'Pricing', 'Integrations'],
-  Resources: ['Blog', 'Case Studies', 'Help Center', 'API Docs'],
-  Company: ['About', 'Careers', 'Contact', 'Privacy'],
+  Product: ['Features', 'Trends', 'Topics', 'Dashboard'],
+  Explore: ['Papers', 'Journals', 'Keywords', 'Data Sources'],
+  Company: ['About', 'Team', 'Contact', 'Privacy'],
 }
 
 export default function Footer() {
@@ -12,11 +12,11 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold text-primary">
-            Collective OS
+            Paper Trend Tracker
             <span className="h-2 w-2 rounded-full bg-accent-primary" />
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            Connect agencies with vetted partners to expand services and grow revenue.
+            Track scientific publication trends and discover emerging research topics from open academic data.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ export default function Footer() {
 
       <div className="mx-auto mt-12 max-w-7xl border-t border-border pt-8">
         <p className="text-center text-xs text-muted">
-          © {new Date().getFullYear()} Collective OS. All rights reserved.
+          © {new Date().getFullYear()} Paper Trend Tracker. All rights reserved.
         </p>
       </div>
     </footer>

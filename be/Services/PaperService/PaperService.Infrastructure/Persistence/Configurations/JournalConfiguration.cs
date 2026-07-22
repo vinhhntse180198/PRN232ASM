@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PaperService.Domain.Entities;
+using PRN232ASM.PaperService.Domain.Entities;
 
-namespace PaperService.Infrastructure.Persistence.Configurations;
+namespace PRN232ASM.PaperService.Infrastructure.Persistence.Configurations;
 
 public class JournalConfiguration : IEntityTypeConfiguration<Journal>
 {
     public void Configure(EntityTypeBuilder<Journal> builder)
     {
-        builder.ToTable("journals");
+        builder.ToTable("Journals");
         builder.HasKey(j => j.Id);
-        builder.Property(j => j.Name).IsRequired().HasMaxLength(500);
-        builder.Property(j => j.Issn).HasMaxLength(20);
+        builder.Property(j => j.Name).HasMaxLength(300).IsRequired();
+        builder.HasIndex(j => j.Name).IsUnique();
     }
 }

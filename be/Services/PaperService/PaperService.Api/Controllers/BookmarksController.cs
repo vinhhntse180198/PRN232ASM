@@ -1,48 +1,61 @@
-using System.Security.Claims;
-using Common.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PaperService.Application.DTOs.Responses;
-using PaperService.Application.Interfaces;
+using PRN232ASM.BuildingBlocks.Common.Models;
+using PRN232ASM.PaperService.Application.DTOs.Requests;
+using PRN232ASM.PaperService.Application.Interfaces;
 
-namespace PaperService.Api.Controllers;
+namespace PRN232ASM.PaperService.Api.Controllers;
 
 [ApiController]
 [Route("api/bookmarks")]
-[Authorize]
 public class BookmarksController : ControllerBase
 {
     private readonly IPaperService _paperService;
 
-    public BookmarksController(IPaperService paperService) => _paperService = paperService;
-
-    [HttpGet]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<BookmarkResponse>>>> GetMine(CancellationToken cancellationToken)
+    public BookmarksController(IPaperService paperService)
     {
-        var userId = GetRequiredUserId();
-        var result = await _paperService.GetBookmarksAsync(userId, cancellationToken);
-        return Ok(ApiResponse<IReadOnlyList<BookmarkResponse>>.Ok(result));
+        _paperService = paperService;
     }
 
-    [HttpPost("{paperId:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> Add(Guid paperId, CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<object>>> Create(
+        [FromBody] BookmarkRequest request,
+        CancellationToken cancellationToken = default)
     {
-        await _paperService.AddBookmarkAsync(GetRequiredUserId(), paperId, cancellationToken);
-        return Ok(ApiResponse<object>.Ok(new { }, "Bookmark added."));
+        var userId = GetUserId();
+        var bookmark = await _paperService.AddBookmarkAsync(userId, request.PaperId, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(bookmark));
     }
 
     [HttpDelete("{paperId:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> Remove(Guid paperId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse>> Delete(Guid paperId, CancellationToken cancellationToken = default)
     {
-        await _paperService.RemoveBookmarkAsync(GetRequiredUserId(), paperId, cancellationToken);
-        return Ok(ApiResponse<object>.Ok(new { }, "Bookmark removed."));
+        var userId = GetUserId();
+        await _paperService.RemoveBookmarkAsync(userId, paperId, cancellationToken);
+        return Ok(ApiResponse.Ok("Bookmark removed."));
     }
 
-    private Guid GetRequiredUserId()
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<object>>> GetByUser(
+        [FromQuery] Guid userId,
+        CancellationToken cancellationToken = default)
     {
-        var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-        if (!Guid.TryParse(sub, out var userId))
-            throw new UnauthorizedAccessException("Invalid user token.");
-        return userId;
+        if (userId == Guid.Empty)
+        {
+            return BadRequest(ApiResponse.Fail("userId is required."));
+        }
+
+        var bookmarks = await _paperService.GetBookmarksAsync(userId, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(bookmarks));
+    }
+
+    private Guid GetUserId()
+    {
+        if (Request.Headers.TryGetValue("X-User-Id", out var headerValue) &&
+            Guid.TryParse(headerValue.FirstOrDefault(), out var userId))
+        {
+            return userId;
+        }
+
+        throw new UnauthorizedAccessException("X-User-Id header is required.");
     }
 }

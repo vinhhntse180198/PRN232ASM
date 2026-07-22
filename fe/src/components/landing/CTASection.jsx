@@ -8,24 +8,24 @@ export default function CTASection() {
       <div className="relative px-6 py-16 text-center sm:px-12 sm:py-20">
         <ScrollReveal>
           <h2 className="font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Ready to Grow?
+            Ready to Explore Research Trends?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted sm:text-base">
-            Join 2,000+ agencies already building profitable partnerships.
+            Start tracking scientific publication trends today — free for students, lecturers, and researchers.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               to="/register"
               className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-base transition-opacity hover:opacity-90 sm:w-auto"
             >
-              Start Free Today
+              Get Started Free
             </Link>
-            <button
-              type="button"
+            <Link
+              to="/login"
               className="inline-flex w-full items-center justify-center rounded-xl border border-primary/30 px-8 py-3.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 sm:w-auto"
             >
-              Book a Demo
-            </button>
+              Explore Dashboard
+            </Link>
           </div>
         </ScrollReveal>
       </div>

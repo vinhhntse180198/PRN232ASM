@@ -1,22 +1,22 @@
-import { BarChart2, Globe, Network, Shield, Zap, Target } from 'lucide-react'
+import { Search, BarChart2, Database, TrendingUp, Bookmark, LayoutDashboard } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const features = [
-  { icon: Shield, title: 'Vetted Network', desc: 'Every partner is verified for quality, reliability, and track record.' },
-  { icon: BarChart2, title: 'Revenue Tracking', desc: 'Monitor pipeline value, win rates, and partner ROI in real time.' },
-  { icon: Globe, title: 'Global Reach', desc: 'Access agencies across 41 countries without opening new offices.' },
-  { icon: Zap, title: 'Lightning Fast', desc: 'Match with qualified partners in hours, not months of outreach.' },
-  { icon: Target, title: 'Smart Matching', desc: 'AI scores fit based on skills, industry, and deal history.' },
-  { icon: Network, title: 'Deep Analytics', desc: 'Insights on partner performance, trends, and growth opportunities.' },
+  { icon: Search, title: 'Powerful Search', desc: 'Find papers by keyword, author, or journal across millions of records.' },
+  { icon: TrendingUp, title: 'Publication Trends', desc: 'See how research topics rise and fall in volume year over year.' },
+  { icon: Database, title: 'Open Data Sources', desc: 'Metadata synced from OpenAlex, Crossref, and Semantic Scholar.' },
+  { icon: BarChart2, title: 'Emerging Topics', desc: 'Spot fast-growing research areas before they become mainstream.' },
+  { icon: Bookmark, title: 'Save & Follow', desc: 'Bookmark papers and follow the journals or keywords you care about.' },
+  { icon: LayoutDashboard, title: 'Smart Dashboards', desc: 'Charts and statistics that turn raw metadata into real insight.' },
 ]
 
 export default function FeaturesGrid() {
   return (
-    <section className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Why Agencies Choose Us
+            Everything You Need to Track Research
           </h2>
         </ScrollReveal>
 

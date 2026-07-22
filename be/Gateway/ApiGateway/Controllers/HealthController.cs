@@ -1,18 +1,12 @@
-using Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiGateway.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("health")]
 public class HealthController : ControllerBase
 {
     [HttpGet]
-    public ActionResult<ApiResponse<object>> Get() =>
-        Ok(ApiResponse<object>.Ok(new
-        {
-            service = "ApiGateway",
-            status = "healthy",
-            timestamp = DateTime.UtcNow
-        }));
+    public IActionResult Get()
+        => Ok(new { status = "Healthy", service = "ApiGateway", timestamp = DateTime.UtcNow });
 }

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { Play } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
-const avatars = ['RB', 'SK', 'AM']
+const fields = ['CS', 'AI', 'BIO']
 
 export default function Hero() {
   return (
@@ -13,21 +13,21 @@ export default function Hero() {
       <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
         <ScrollReveal>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-primary/20 bg-accent-primary/10 px-4 py-1.5 text-xs font-medium text-accent-glow">
-            ✦ Agency Growth Platform
+            ✦ Scientific Publication Trend Tracking
           </span>
         </ScrollReveal>
 
         <ScrollReveal delay={100}>
           <h1 className="mx-auto mt-8 max-w-4xl font-display text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="block text-primary">Power Agency Growth</span>
-            <span className="block text-gradient">Through Partners</span>
+            <span className="block text-primary">Track Research Trends</span>
+            <span className="block text-gradient">Before They Peak</span>
           </h1>
         </ScrollReveal>
 
         <ScrollReveal delay={200}>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-            Collective OS connects you with vetted partners to win more deals, expand services, and grow
-            revenue — without hiring.
+            Explore how scientific topics rise and fall over time. Search papers, follow keywords and
+            journals, and turn open academic metadata into clear, visual insight.
           </p>
         </ScrollReveal>
 
@@ -37,7 +37,7 @@ export default function Hero() {
               to="/register"
               className="inline-flex w-full items-center justify-center rounded-xl bg-accent-primary px-8 py-3.5 text-sm font-semibold text-white shadow-glow transition-all hover:bg-accent-glow sm:w-auto"
             >
-              Join the Network
+              Get Started Free
             </Link>
             <button
               type="button"
@@ -52,20 +52,20 @@ export default function Hero() {
         <ScrollReveal delay={400}>
           <div className="mt-12 flex items-center justify-center gap-4">
             <div className="flex -space-x-3">
-              {avatars.map((initials, i) => (
+              {fields.map((initials, i) => (
                 <div
                   key={initials}
                   className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-base bg-elevated text-[10px] font-semibold text-accent-glow"
-                  style={{ zIndex: avatars.length - i }}
+                  style={{ zIndex: fields.length - i }}
                 >
                   {initials}
                 </div>
               ))}
             </div>
             <p className="text-left text-sm text-muted">
-              <span className="font-medium text-primary">6M+ verified partners</span>
+              <span className="font-medium text-primary">250M+ papers indexed</span>
               <br />
-              across 41 countries
+              across every discipline
             </p>
           </div>
         </ScrollReveal>

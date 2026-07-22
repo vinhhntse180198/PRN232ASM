@@ -1,19 +1,30 @@
 using Microsoft.EntityFrameworkCore;
-using PaperService.Application.Interfaces.Repositories;
-using PaperService.Domain.Entities;
+using PRN232ASM.PaperService.Application.Interfaces.Repositories;
+using PRN232ASM.PaperService.Domain.Entities;
 
-namespace PaperService.Infrastructure.Persistence.Repositories;
+namespace PRN232ASM.PaperService.Infrastructure.Persistence.Repositories;
 
 public class KeywordRepository : IKeywordRepository
 {
     private readonly PaperServiceDbContext _context;
 
-    public KeywordRepository(PaperServiceDbContext context) => _context = context;
+    public KeywordRepository(PaperServiceDbContext context)
+    {
+        _context = context;
+    }
 
-    public async Task<IReadOnlyList<Keyword>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        await _context.Keywords
-            .AsNoTracking()
-            .Include(k => k.PaperKeywords)
-            .OrderBy(k => k.Name)
-            .ToListAsync(cancellationToken);
+    public async Task AddAsync(Keyword keyword, CancellationToken cancellationToken = default)
+    {
+        await _context.Keywords.AddAsync(keyword, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Keyword>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Keywords.AsNoTracking().OrderBy(k => k.Name).ToListAsync(cancellationToken);
+    }
+
+    public async Task<Keyword?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+    {
+        return await _context.Keywords.FirstOrDefaultAsync(k => k.Name == name, cancellationToken);
+    }
 }

@@ -1,4 +1,4 @@
-namespace Common.Models;
+namespace PRN232ASM.BuildingBlocks.Common.Models;
 
 public class ApiResponse<T>
 {
@@ -10,5 +10,14 @@ public class ApiResponse<T>
         new() { Success = true, Data = data, Message = message };
 
     public static ApiResponse<T> Fail(string message) =>
+        new() { Success = false, Message = message };
+}
+
+public class ApiResponse : ApiResponse<object>
+{
+    public static ApiResponse Ok(string? message = null) =>
+        new() { Success = true, Message = message };
+
+    public new static ApiResponse Fail(string message) =>
         new() { Success = false, Message = message };
 }

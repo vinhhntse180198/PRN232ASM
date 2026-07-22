@@ -8,7 +8,7 @@ export default function AuthLayout({ children, title, subtitle }) {
 
       <div className="relative w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2 font-display text-xl font-bold text-primary">
-          Collective OS
+          Paper Trend Tracker
           <span className="h-2 w-2 rounded-full bg-accent-primary shadow-glow-sm" />
         </Link>
 

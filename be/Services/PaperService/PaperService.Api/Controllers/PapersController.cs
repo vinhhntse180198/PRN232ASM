@@ -1,12 +1,9 @@
-using System.Security.Claims;
-using Common.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PaperService.Application.DTOs.Requests;
-using PaperService.Application.DTOs.Responses;
-using PaperService.Application.Interfaces;
+using PRN232ASM.BuildingBlocks.Common.Models;
+using PRN232ASM.PaperService.Application.DTOs.Requests;
+using PRN232ASM.PaperService.Application.Interfaces;
 
-namespace PaperService.Api.Controllers;
+namespace PRN232ASM.PaperService.Api.Controllers;
 
 [ApiController]
 [Route("api/papers")]
@@ -14,31 +11,57 @@ public class PapersController : ControllerBase
 {
     private readonly IPaperService _paperService;
 
-    public PapersController(IPaperService paperService) => _paperService = paperService;
-
-    [HttpGet("search")]
-    [AllowAnonymous]
-    public async Task<ActionResult<ApiResponse<PagedResult<PaperListItemResponse>>>> Search(
-        [FromQuery] SearchPaperRequest request,
-        CancellationToken cancellationToken)
+    public PapersController(IPaperService paperService)
     {
-        var result = await _paperService.SearchAsync(request, GetUserId(), cancellationToken);
-        return Ok(ApiResponse<PagedResult<PaperListItemResponse>>.Ok(result));
+        _paperService = paperService;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<ApiResponse<PagedResult<object>>>> Search(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? keyword = null,
+        [FromQuery] string? author = null,
+        [FromQuery] string? journal = null,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _paperService.SearchAsync(new SearchPaperRequest
+        {
+            Page = page,
+            PageSize = pageSize,
+            Keyword = keyword,
+            Author = author,
+            Journal = journal
+        }, cancellationToken);
+
+        return Ok(ApiResponse<object>.Ok(result));
     }
 
     [HttpGet("{id:guid}")]
-    [AllowAnonymous]
-    public async Task<ActionResult<ApiResponse<PaperDetailResponse>>> GetById(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<object>>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await _paperService.GetDetailAsync(id, GetUserId(), cancellationToken);
-        return Ok(ApiResponse<PaperDetailResponse>.Ok(result));
+        var paper = await _paperService.GetByIdAsync(id, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(paper));
     }
 
-    private Guid? GetUserId()
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<object>>> Create(
+        [FromBody] CreatePaperRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-        return Guid.TryParse(sub, out var userId) ? userId : null;
+        var paper = await _paperService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = paper.Id }, ApiResponse<object>.Ok(paper));
+    }
+
+    [HttpPost("import")]
+    public async Task<ActionResult<ApiResponse<object>>> Import(
+        [FromBody] ImportPaperRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var created = await _paperService.ImportAsync(request, cancellationToken);
+        if (!created)
+            return Conflict(ApiResponse.Fail("Paper already exists."));
+
+        return Ok(ApiResponse<object>.Ok(new { imported = true }));
     }
 }

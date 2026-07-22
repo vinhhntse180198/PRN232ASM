@@ -1,17 +1,21 @@
-using PaperService.Domain.Entities;
+using PRN232ASM.BuildingBlocks.Common.Models;
+using PRN232ASM.PaperService.Domain.Entities;
 
-namespace PaperService.Application.Interfaces.Repositories;
+namespace PRN232ASM.PaperService.Application.Interfaces.Repositories;
 
 public interface IResearchPaperRepository
 {
-    Task<(IReadOnlyList<ResearchPaper> Items, int TotalCount)> SearchAsync(
+    Task<PagedResult<ResearchPaper>> SearchAsync(
+        int page,
+        int pageSize,
         string? keyword,
         string? author,
         string? journal,
-        Guid? topicId,
-        int page,
-        int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<ResearchPaper?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ResearchPaper?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByDoiOrTitleAsync(string? doi, string title, CancellationToken cancellationToken = default);
+    Task AddAsync(ResearchPaper paper, CancellationToken cancellationToken = default);
+    Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ResearchPaper>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
 }

@@ -2,34 +2,34 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const testimonials = [
   {
-    quote: 'Collective OS helped us close $180k in partner-sourced deals in our first quarter. The matching is eerily accurate.',
-    name: 'Sarah Chen',
-    role: 'Founder, Pixel & Co.',
-    initials: 'SC',
+    quote: 'I found the emerging topics for my thesis in minutes instead of weeks of manual review.',
+    name: 'Dr. Anh Tran',
+    role: 'Lecturer, Computer Science',
+    initials: 'AT',
   },
   {
-    quote: 'We expanded into video production without hiring a single editor. Our partners feel like an extension of our team.',
-    name: 'Marcus Webb',
-    role: 'CEO, Northline Agency',
-    initials: 'MW',
+    quote: 'The trend charts made the literature review section of my paper so much stronger.',
+    name: 'Minh Le',
+    role: 'PhD Student, Data Science',
+    initials: 'ML',
   },
   {
-    quote: 'The dashboard alone paid for itself. We finally have visibility into which partnerships actually drive revenue.',
-    name: 'Elena Rossi',
-    role: 'COO, Forma Labs',
+    quote: 'We track which subfields are heating up to help plan our lab’s research direction.',
+    name: 'Prof. Elena Rossi',
+    role: 'Research Lead, AI Lab',
     initials: 'ER',
   },
 ]
 
 export default function Testimonials() {
   return (
-    <section className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id="testimonials" className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Loved by Agencies Worldwide
+            Trusted by Researchers &amp; Students
           </h2>
-          <p className="mt-2 text-center text-sm text-muted">2,000+ agency founders</p>
+          <p className="mt-2 text-center text-sm text-muted">Used by labs, lecturers, and universities</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">

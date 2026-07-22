@@ -1,31 +1,155 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: prn232asm-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   api-gateway:
     build:
       context: ../be
       dockerfile: Gateway/ApiGateway/Dockerfile
+    container_name: prn232asm-api-gateway
     ports:
       - "5000:8080"
     environment:
-      ASPNETCORE_URLS: http://+:8080
-      ReverseProxy__Clusters__paper-cluster__Destinations__paper__Address: http://paper-service:8080
+      ASPNETCORE_ENVIRONMENT: Development
+      JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
+      JWT__Issuer: PRN232ASM
+      JWT__Audience: PRN232ASM-Users
       ReverseProxy__Clusters__auth-cluster__Destinations__auth__Address: http://auth-service:8080
+      ReverseProxy__Clusters__paper-cluster__Destinations__paper__Address: http://paper-service:8080
+      ReverseProxy__Clusters__trend-cluster__Destinations__trend__Address: http://trend-service:8080
+      ReverseProxy__Clusters__notification-cluster__Destinations__notification__Address: http://notification-service:8080
+      ReverseProxy__Clusters__sync-cluster__Destinations__sync__Address: http://sync-service:8080
     depends_on:
+      - auth-service
       - paper-service
+      - trend-service
+      - notification-service
+      - sync-service
+
+  auth-service:
+    build:
+      context: ../be
+      dockerfile: Services/AuthService/AuthService.Api/Dockerfile
+    container_name: prn232asm-auth-service
+    ports:
+      - "5131:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
+      JWT__Issuer: PRN232ASM
+      JWT__Audience: PRN232ASM-Users
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   paper-service:
     build:
       context: ../be
       dockerfile: Services/PaperService/PaperService.Api/Dockerfile
-    environment:
-      ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: ${PAPER_DB_CONNECTION}
-
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    container_name: prn232asm-paper-service
     ports:
-      - "5432:5432"
+      - "5002:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  trend-service:
+    build:
+      context: ../be
+      dockerfile: Services/TrendService/TrendService.Api/Dockerfile
+    container_name: prn232asm-trend-service
+    ports:
+      - "5003:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ../be
+      dockerfile: Services/NotificationService/NotificationService.Api/Dockerfile
+    container_name: prn232asm-notification-service
+    ports:
+      - "5004:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Data Source=/data/notify.db
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
     volumes:
-      - ./init-scripts:/docker-entrypoint-initdb.d
+      - notification-data:/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  sync-service:
+    build:
+      context: ../be
+      dockerfile: Services/SyncService/SyncService.Api/Dockerfile
+    container_name: prn232asm-sync-service
+    ports:
+      - "5005:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Data Source=/data/sync.db
+      OpenAlex__Enabled: "false"
+      OpenAlex__ApiKey: ""
+      PaperService__BaseUrl: http://paper-service:8080
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+    volumes:
+      - sync-data:/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      paper-service:
+        condition: service_started
+
+  fe:
+    profiles: ["frontend"]
+    build:
+      context: ../fe
+      dockerfile: Dockerfile
+    container_name: prn232asm-fe
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    depends_on:
+      - api-gateway
+
+volumes:
+  notification-data:
+  sync-data:

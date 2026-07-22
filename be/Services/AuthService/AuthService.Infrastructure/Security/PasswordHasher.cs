@@ -1,0 +1,12 @@
+using PRN232ASM.AuthService.Application.Interfaces;
+
+namespace PRN232ASM.AuthService.Infrastructure.Security;
+
+public class PasswordHasher : IPasswordHasher
+{
+    public string Hash(string password)
+        => BCrypt.Net.BCrypt.HashPassword(password);
+
+    public bool Verify(string password, string passwordHash)
+        => BCrypt.Net.BCrypt.Verify(password, passwordHash);
+}
