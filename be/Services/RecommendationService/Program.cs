@@ -2,7 +2,12 @@ using PRN232ASM.RecommendationService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls(builder.Configuration["Urls"] ?? "http://localhost:5006");
+// Prefer ASPNETCORE_URLS (Docker); fall back to Urls/local default for `dotnet run`.
+if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
+{
+    builder.WebHost.UseUrls(builder.Configuration["Urls"] ?? "http://localhost:5006");
+}
+
 
 builder.Services.AddGrpc();
 

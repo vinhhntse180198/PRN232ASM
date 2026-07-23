@@ -6,7 +6,11 @@ using PRN232ASM.PaperService.Infrastructure.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://localhost:5002");
+// Prefer ASPNETCORE_URLS (Docker); fall back to local default for `dotnet run`.
+if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
+{
+    builder.WebHost.UseUrls("http://localhost:5002");
+}
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
