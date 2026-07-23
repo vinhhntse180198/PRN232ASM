@@ -23,6 +23,10 @@
 
   <ItemGroup>
     <Protobuf Include="..\..\RecommendationService\Protos\recommendation.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\PricingService\Protos\pricing.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\InferenceService\Protos\inference.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\InventoryService\Protos\inventory.proto" GrpcServices="Client" />
+    <Protobuf Include="..\..\UserProfileService\Protos\userprofile.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>

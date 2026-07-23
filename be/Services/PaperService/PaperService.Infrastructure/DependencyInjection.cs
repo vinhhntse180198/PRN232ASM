@@ -24,6 +24,10 @@ public static class DependencyInjection
         services.AddScoped<IPaperService, Application.Services.PaperService>();
         services.AddScoped<IPaperEventPublisher, PaperEventPublisher>();
         services.AddSingleton<IRecommendationClient, RecommendationGrpcClient>();
+        services.AddSingleton<IPricingClient, PricingGrpcClient>();
+        services.AddSingleton<IInferenceClient, InferenceGrpcClient>();
+        services.AddSingleton<IInventoryClient, InventoryGrpcClient>();
+        services.AddSingleton<IUserProfileClient, UserProfileGrpcClient>();
 
         services.AddRabbitMqEventBus(configuration);
 

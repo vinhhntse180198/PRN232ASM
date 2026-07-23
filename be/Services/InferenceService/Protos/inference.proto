@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "PRN232ASM.Inference.Grpc";
+
+package inference;
+
+service PaperInference {
+  rpc InferInsights (InsightRequest) returns (InsightReply);
+}
+
+message InsightRequest {
+  string paper_id = 1;
+  string title = 2;
+  string abstract_text = 3;
+  repeated string existing_keywords = 4;
+  repeated string existing_topics = 5;
+}
+
+message InsightReply {
+  string paper_id = 1;
+  repeated string suggested_keywords = 2;
+  repeated string suggested_topics = 3;
+  double confidence = 4;
+  string summary = 5;
+}

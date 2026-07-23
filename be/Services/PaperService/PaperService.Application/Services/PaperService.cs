@@ -15,17 +15,29 @@ public class PaperService : IPaperService
     private readonly IMapper _mapper;
     private readonly IPaperEventPublisher _eventPublisher;
     private readonly IRecommendationClient _recommendationClient;
+    private readonly IPricingClient _pricingClient;
+    private readonly IInferenceClient _inferenceClient;
+    private readonly IInventoryClient _inventoryClient;
+    private readonly IUserProfileClient _userProfileClient;
 
     public PaperService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IPaperEventPublisher eventPublisher,
-        IRecommendationClient recommendationClient)
+        IRecommendationClient recommendationClient,
+        IPricingClient pricingClient,
+        IInferenceClient inferenceClient,
+        IInventoryClient inventoryClient,
+        IUserProfileClient userProfileClient)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _eventPublisher = eventPublisher;
         _recommendationClient = recommendationClient;
+        _pricingClient = pricingClient;
+        _inferenceClient = inferenceClient;
+        _inventoryClient = inventoryClient;
+        _userProfileClient = userProfileClient;
     }
 
     public async Task<PagedResult<PaperSummaryResponse>> SearchAsync(SearchPaperRequest request, CancellationToken cancellationToken = default)
@@ -315,6 +327,138 @@ public class PaperService : IPaperService
         }
 
         return results;
+    }
+
+    public async Task<PaperImpactScoreResponse> GetImpactScoreAsync(Guid paperId, CancellationToken cancellationToken = default)
+    {
+        var paper = await _unitOfWork.ResearchPapers.GetByIdAsync(paperId, cancellationToken)
+            ?? throw new NotFoundException(nameof(ResearchPaper), paperId);
+
+        var scored = await _pricingClient.ComputeImpactScoreAsync(
+            new ImpactScoreQuery(
+                paper.Id,
+                paper.Title,
+                paper.PublicationYear,
+                paper.CitationCount,
+                paper.PaperKeywords.Count,
+                paper.PaperTopics.Count,
+                paper.PaperAuthors.Count,
+                paper.Journal?.Name ?? string.Empty),
+            cancellationToken);
+
+        return new PaperImpactScoreResponse
+        {
+            PaperId = paper.Id,
+            Title = paper.Title,
+            Score = scored.Score,
+            CurrencyLabel = scored.CurrencyLabel,
+            Tier = scored.Tier,
+            Explanation = scored.Explanation
+        };
+    }
+
+    public async Task<PaperInsightResponse> GetInsightsAsync(Guid paperId, CancellationToken cancellationToken = default)
+    {
+        var paper = await _unitOfWork.ResearchPapers.GetByIdAsync(paperId, cancellationToken)
+            ?? throw new NotFoundException(nameof(ResearchPaper), paperId);
+
+        var insight = await _inferenceClient.InferInsightsAsync(
+            new InsightQuery(
+                paper.Id,
+                paper.Title,
+                paper.Abstract ?? string.Empty,
+                paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
+                paper.PaperTopics.Select(pt => pt.Topic.Name).ToList()),
+            cancellationToken);
+
+        return new PaperInsightResponse
+        {
+            PaperId = paper.Id,
+            SuggestedKeywords = insight.SuggestedKeywords,
+            SuggestedTopics = insight.SuggestedTopics,
+            Confidence = insight.Confidence,
+            Summary = insight.Summary
+        };
+    }
+
+    public async Task<JournalCapacityResponse> GetJournalCapacityAsync(
+        Guid journalId,
+        int? year = null,
+        CancellationToken cancellationToken = default)
+    {
+        var journal = await _unitOfWork.Journals.GetByIdAsync(journalId, cancellationToken)
+            ?? throw new NotFoundException(nameof(Journal), journalId);
+
+        var targetYear = year is > 0 ? year.Value : DateTime.UtcNow.Year;
+        var allPapers = await _unitOfWork.ResearchPapers.GetAllWithDetailsAsync(cancellationToken);
+        var journalPapers = allPapers.Where(p => p.JournalId == journalId).ToList();
+        var papersInYear = journalPapers.Count(p => p.PublicationYear == targetYear);
+
+        var capacity = await _inventoryClient.GetCapacityAsync(
+            new JournalCapacityQuery(
+                journal.Id,
+                journal.Name,
+                targetYear,
+                papersInYear,
+                journalPapers.Count),
+            cancellationToken);
+
+        return new JournalCapacityResponse
+        {
+            JournalId = journal.Id,
+            JournalName = journal.Name,
+            Year = capacity.Year,
+            Capacity = capacity.Capacity,
+            Used = capacity.Used,
+            Remaining = capacity.Remaining,
+            Status = capacity.Status,
+            Note = capacity.Note
+        };
+    }
+
+    public async Task<ReadingProfileResponse> GetReadingProfileAsync(
+        Guid userId,
+        IReadOnlyList<string>? followedKeywords = null,
+        IReadOnlyList<string>? followedTopics = null,
+        IReadOnlyList<string>? followedJournals = null,
+        CancellationToken cancellationToken = default)
+    {
+        var bookmarks = await _unitOfWork.Bookmarks.GetByUserAsync(userId, cancellationToken);
+        var signals = new List<BookmarkedPaperSignal>();
+
+        foreach (var bookmark in bookmarks)
+        {
+            var paper = await _unitOfWork.ResearchPapers.GetByIdAsync(bookmark.PaperId, cancellationToken);
+            if (paper is null) continue;
+
+            signals.Add(new BookmarkedPaperSignal(
+                paper.Id,
+                paper.Title,
+                paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
+                paper.PaperTopics.Select(pt => pt.Topic.Name).ToList(),
+                paper.Journal?.Name ?? string.Empty,
+                paper.PublicationYear));
+        }
+
+        var profile = await _userProfileClient.BuildReadingProfileAsync(
+            new ReadingProfileQuery(
+                userId,
+                signals,
+                followedKeywords ?? Array.Empty<string>(),
+                followedTopics ?? Array.Empty<string>(),
+                followedJournals ?? Array.Empty<string>()),
+            cancellationToken);
+
+        return new ReadingProfileResponse
+        {
+            UserId = profile.UserId,
+            BookmarkCount = profile.BookmarkCount,
+            TopKeywords = profile.TopKeywords.Select(x => new InterestItemResponse { Name = x.Name, Weight = x.Weight }).ToList(),
+            TopTopics = profile.TopTopics.Select(x => new InterestItemResponse { Name = x.Name, Weight = x.Weight }).ToList(),
+            TopJournals = profile.TopJournals.Select(x => new InterestItemResponse { Name = x.Name, Weight = x.Weight }).ToList(),
+            PersonaLabel = profile.PersonaLabel,
+            Summary = profile.Summary
+        };
     }
 }
 

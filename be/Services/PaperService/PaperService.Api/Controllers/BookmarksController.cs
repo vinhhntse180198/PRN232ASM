@@ -48,6 +48,33 @@ public class BookmarksController : ControllerBase
         return Ok(ApiResponse<object>.Ok(bookmarks));
     }
 
+    /// <summary>
+    /// REST → UserProfileService gRPC (reading profile from bookmark papers in Paper DB).
+    /// Optional follow names can be passed as query lists for richer signals.
+    /// </summary>
+    [HttpGet("reading-profile")]
+    public async Task<ActionResult<ApiResponse<object>>> GetReadingProfile(
+        [FromQuery] Guid userId,
+        [FromQuery] string[]? followedKeywords = null,
+        [FromQuery] string[]? followedTopics = null,
+        [FromQuery] string[]? followedJournals = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (userId == Guid.Empty)
+        {
+            return BadRequest(ApiResponse.Fail("userId is required."));
+        }
+
+        var profile = await _paperService.GetReadingProfileAsync(
+            userId,
+            followedKeywords,
+            followedTopics,
+            followedJournals,
+            cancellationToken);
+
+        return Ok(ApiResponse<object>.Ok(profile));
+    }
+
     private Guid GetUserId()
     {
         if (Request.Headers.TryGetValue("X-User-Id", out var headerValue) &&

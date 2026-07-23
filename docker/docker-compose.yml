@@ -73,10 +73,22 @@ services:
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
       RecommendationService__Address: http://recommendation-service:8080
+      PricingService__Address: http://pricing-service:8080
+      InferenceService__Address: http://inference-service:8080
+      InventoryService__Address: http://inventory-service:8080
+      UserProfileService__Address: http://user-profile-service:8080
     depends_on:
       rabbitmq:
         condition: service_healthy
       recommendation-service:
+        condition: service_started
+      pricing-service:
+        condition: service_started
+      inference-service:
+        condition: service_started
+      inventory-service:
+        condition: service_started
+      user-profile-service:
         condition: service_started
 
   recommendation-service:
@@ -86,6 +98,54 @@ services:
     container_name: prn232asm-recommendation-service
     ports:
       - "5006:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
+
+  pricing-service:
+    build:
+      context: ../be
+      dockerfile: Services/PricingService/Dockerfile
+    container_name: prn232asm-pricing-service
+    ports:
+      - "5007:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
+
+  inference-service:
+    build:
+      context: ../be
+      dockerfile: Services/InferenceService/Dockerfile
+    container_name: prn232asm-inference-service
+    ports:
+      - "5008:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
+
+  inventory-service:
+    build:
+      context: ../be
+      dockerfile: Services/InventoryService/Dockerfile
+    container_name: prn232asm-inventory-service
+    ports:
+      - "5009:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
+
+  user-profile-service:
+    build:
+      context: ../be
+      dockerfile: Services/UserProfileService/Dockerfile
+    container_name: prn232asm-user-profile-service
+    ports:
+      - "5010:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080

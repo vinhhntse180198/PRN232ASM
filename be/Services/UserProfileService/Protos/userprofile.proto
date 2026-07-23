@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option csharp_namespace = "PRN232ASM.UserProfile.Grpc";
+
+package userprofile;
+
+service ReaderProfiler {
+  rpc BuildReadingProfile (ReadingProfileRequest) returns (ReadingProfileReply);
+}
+
+message BookmarkedPaperSignal {
+  string paper_id = 1;
+  string title = 2;
+  repeated string keywords = 3;
+  repeated string topics = 4;
+  string journal_name = 5;
+  int32 publication_year = 6;
+}
+
+message ReadingProfileRequest {
+  string user_id = 1;
+  repeated BookmarkedPaperSignal bookmarks = 2;
+  repeated string followed_keywords = 3;
+  repeated string followed_topics = 4;
+  repeated string followed_journals = 5;
+}
+
+message InterestItem {
+  string name = 1;
+  int32 weight = 2;
+}
+
+message ReadingProfileReply {
+  string user_id = 1;
+  int32 bookmark_count = 2;
+  repeated InterestItem top_keywords = 3;
+  repeated InterestItem top_topics = 4;
+  repeated InterestItem top_journals = 5;
+  string persona_label = 6;
+  string summary = 7;
+}

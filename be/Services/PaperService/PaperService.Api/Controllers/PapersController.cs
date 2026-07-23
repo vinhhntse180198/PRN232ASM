@@ -57,6 +57,26 @@ public class PapersController : ControllerBase
         return Ok(ApiResponse<object>.Ok(items));
     }
 
+    /// <summary>
+    /// REST → PricingService gRPC (impact / "pricing" score from Paper DB fields).
+    /// </summary>
+    [HttpGet("{id:guid}/impact-score")]
+    public async Task<ActionResult<ApiResponse<object>>> GetImpactScore(Guid id, CancellationToken cancellationToken = default)
+    {
+        var result = await _paperService.GetImpactScoreAsync(id, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(result));
+    }
+
+    /// <summary>
+    /// REST → InferenceService gRPC (AI/ML-style insights from title/abstract in Paper DB).
+    /// </summary>
+    [HttpGet("{id:guid}/insights")]
+    public async Task<ActionResult<ApiResponse<object>>> GetInsights(Guid id, CancellationToken cancellationToken = default)
+    {
+        var result = await _paperService.GetInsightsAsync(id, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(result));
+    }
+
     [HttpPost]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreatePaperRequest request,

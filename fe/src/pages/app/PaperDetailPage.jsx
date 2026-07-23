@@ -6,6 +6,8 @@ import {
   addBookmark,
   getBookmarks,
   getPaper,
+  getPaperImpactScore,
+  getPaperInsights,
   getPaperRecommendations,
   removeBookmark,
 } from '../../services/paperService'
@@ -15,6 +17,8 @@ export default function PaperDetailPage() {
   const { user } = useAuth()
   const [paper, setPaper] = useState(null)
   const [recommendations, setRecommendations] = useState([])
+  const [impact, setImpact] = useState(null)
+  const [insights, setInsights] = useState(null)
   const [bookmarked, setBookmarked] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -25,11 +29,15 @@ export default function PaperDetailPage() {
     Promise.all([
       getPaper(id),
       getPaperRecommendations(id, 5).catch(() => []),
+      getPaperImpactScore(id).catch(() => null),
+      getPaperInsights(id).catch(() => null),
       user?.id ? getBookmarks(user.id) : Promise.resolve([]),
     ])
-      .then(([p, recs, bookmarks]) => {
+      .then(([p, recs, impactScore, aiInsights, bookmarks]) => {
         setPaper(p)
         setRecommendations(recs || [])
+        setImpact(impactScore)
+        setInsights(aiInsights)
         setBookmarked((bookmarks || []).some((b) => b.paperId === id))
       })
       .catch((err) => setError(err.message))
@@ -83,6 +91,36 @@ export default function PaperDetailPage() {
         <span>DOI: {paper.doi || 'N/A'}</span>
         <span>Citations: {paper.citationCount}</span>
       </div>
+
+      {(impact || insights) && (
+        <section className="grid gap-4 md:grid-cols-2">
+          {impact && (
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <h2 className="mb-1 text-sm font-semibold text-primary">Impact score (Pricing gRPC)</h2>
+              <p className="text-2xl font-bold text-accent-glow">
+                {impact.score} <span className="text-sm font-normal text-muted">{impact.currencyLabel}</span>
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                Tier: {impact.tier} — {impact.explanation}
+              </p>
+            </div>
+          )}
+          {insights && (
+            <div className="rounded-xl border border-border bg-surface p-4">
+              <h2 className="mb-1 text-sm font-semibold text-primary">AI insights (Inference gRPC)</h2>
+              <p className="text-xs text-muted">{insights.summary}</p>
+              <p className="mt-2 text-xs text-accent-glow">Confidence {(insights.confidence * 100).toFixed(0)}%</p>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {(insights.suggestedTopics || []).map((t) => (
+                  <span key={t} className="rounded-full bg-elevated px-2 py-0.5 text-[11px] text-muted">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-2 font-semibold text-primary">Abstract</h2>

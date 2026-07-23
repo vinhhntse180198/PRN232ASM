@@ -23,6 +23,11 @@ public class JournalRepository : IJournalRepository
         return await _context.Journals.AsNoTracking().OrderBy(j => j.Name).ToListAsync(cancellationToken);
     }
 
+    public async Task<Journal?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Journals.AsNoTracking().FirstOrDefaultAsync(j => j.Id == id, cancellationToken);
+    }
+
     public async Task<Journal?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         return await _context.Journals.FirstOrDefaultAsync(j => j.Name == name, cancellationToken);
