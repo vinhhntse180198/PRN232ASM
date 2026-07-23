@@ -44,6 +44,19 @@ public class PapersController : ControllerBase
         return Ok(ApiResponse<object>.Ok(paper));
     }
 
+    /// <summary>
+    /// REST entry point that calls RecommendationService over gRPC.
+    /// </summary>
+    [HttpGet("{id:guid}/recommendations")]
+    public async Task<ActionResult<ApiResponse<object>>> GetRecommendations(
+        Guid id,
+        [FromQuery] int limit = 5,
+        CancellationToken cancellationToken = default)
+    {
+        var items = await _paperService.GetRecommendationsAsync(id, limit, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(items));
+    }
+
     [HttpPost]
     public async Task<ActionResult<ApiResponse<object>>> Create(
         [FromBody] CreatePaperRequest request,

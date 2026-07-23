@@ -15,6 +15,7 @@ dotnet run --project be/Services/PaperService/PaperService.Api
 dotnet run --project be/Services/TrendService/TrendService.Api
 dotnet run --project be/Services/NotificationService/NotificationService.Api
 dotnet run --project be/Services/SyncService/SyncService.Api
+dotnet run --project be/Services/RecommendationService/RecommendationService.Api.csproj
 dotnet run --project be/Gateway/ApiGateway
 ```
 
@@ -52,6 +53,7 @@ Mở http://localhost:5173
 | TrendService | 5003 |
 | NotificationService | 5004 |
 | SyncService | 5005 |
+| RecommendationService (gRPC) | 5006 |
 | Frontend | 5173 |
 | RabbitMQ UI | 15672 |
 
@@ -63,10 +65,11 @@ Mở http://localhost:5173
 
 ## Yêu cầu môn học
 
-- 5 Microservices + YARP Gateway
+- 5+ Microservices + YARP Gateway
 - JWT Authentication
-- RabbitMQ (5 events)
+- RabbitMQ (events)
 - Hangfire (Sync daily, Trend aggregation) + Cleanup notifications
+- **gRPC RecommendationService** (Paper REST → gRPC)
 - EF Core SQLite (local) / PostgreSQL (Supabase)
 - Docker Compose
 - User Web + Admin Web (React + Vite)

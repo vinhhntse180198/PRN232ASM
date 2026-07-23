@@ -14,12 +14,18 @@ public class PaperService : IPaperService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IPaperEventPublisher _eventPublisher;
+    private readonly IRecommendationClient _recommendationClient;
 
-    public PaperService(IUnitOfWork unitOfWork, IMapper mapper, IPaperEventPublisher eventPublisher)
+    public PaperService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IPaperEventPublisher eventPublisher,
+        IRecommendationClient recommendationClient)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _eventPublisher = eventPublisher;
+        _recommendationClient = recommendationClient;
     }
 
     public async Task<PagedResult<PaperSummaryResponse>> SearchAsync(SearchPaperRequest request, CancellationToken cancellationToken = default)
@@ -251,6 +257,64 @@ public class PaperService : IPaperService
     {
         var bookmarks = await _unitOfWork.Bookmarks.GetByUserAsync(userId, cancellationToken);
         return _mapper.Map<IReadOnlyList<BookmarkResponse>>(bookmarks);
+    }
+
+    public async Task<IReadOnlyList<PaperRecommendationResponse>> GetRecommendationsAsync(
+        Guid paperId,
+        int limit = 5,
+        CancellationToken cancellationToken = default)
+    {
+        var source = await _unitOfWork.ResearchPapers.GetByIdAsync(paperId, cancellationToken)
+            ?? throw new NotFoundException(nameof(ResearchPaper), paperId);
+
+        var allPapers = await _unitOfWork.ResearchPapers.GetAllWithDetailsAsync(cancellationToken);
+        var candidates = allPapers
+            .Where(p => p.Id != paperId)
+            .Take(200)
+            .Select(p => new RecommendationCandidate(
+                p.Id,
+                p.Title,
+                p.PublicationYear,
+                p.Journal?.Name ?? string.Empty,
+                p.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
+                p.PaperTopics.Select(pt => pt.Topic.Name).ToList()))
+            .ToList();
+
+        var ranked = await _recommendationClient.GetRecommendationsAsync(
+            new RecommendationQuery(
+                source.Id,
+                limit <= 0 ? 5 : Math.Min(limit, 20),
+                source.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
+                source.PaperTopics.Select(pt => pt.Topic.Name).ToList(),
+                source.Journal?.Name ?? string.Empty,
+                source.PublicationYear,
+                candidates),
+            cancellationToken);
+
+        var byId = allPapers.ToDictionary(p => p.Id);
+        var results = new List<PaperRecommendationResponse>();
+
+        foreach (var item in ranked)
+        {
+            if (!byId.TryGetValue(item.PaperId, out var paper))
+                continue;
+
+            results.Add(new PaperRecommendationResponse
+            {
+                PaperId = paper.Id,
+                Title = paper.Title,
+                JournalName = paper.Journal?.Name ?? string.Empty,
+                PublicationYear = paper.PublicationYear,
+                Authors = paper.PaperAuthors
+                    .OrderBy(pa => pa.AuthorOrder)
+                    .Select(pa => pa.Author.Name)
+                    .ToList(),
+                Score = item.Score,
+                Reason = item.Reason
+            });
+        }
+
+        return results;
     }
 }
 

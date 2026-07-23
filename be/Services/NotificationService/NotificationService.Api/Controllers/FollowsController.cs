@@ -1,7 +1,6 @@
 using NotificationService.Application.DTOs;
 using NotificationService.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using PRN232ASM.BuildingBlocks.Common.Exceptions;
 using PRN232ASM.BuildingBlocks.Common.Models;
 
 namespace NotificationService.Api.Controllers;
@@ -44,6 +43,15 @@ public class FollowsController : ControllerBase
         return Ok(ApiResponse<object>.Ok(new { }, "Keyword followed."));
     }
 
+    [HttpPost("journal")]
+    public async Task<ActionResult<ApiResponse<object>>> FollowJournal(
+        [FromBody] FollowJournalRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _followService.FollowJournalAsync(request, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(new { }, "Journal followed."));
+    }
+
     [HttpDelete("topic/{topicId:guid}")]
     public async Task<ActionResult<ApiResponse<object>>> UnfollowTopic(
         Guid topicId,
@@ -52,5 +60,25 @@ public class FollowsController : ControllerBase
     {
         await _followService.UnfollowTopicAsync(userId, topicId, cancellationToken);
         return Ok(ApiResponse<object>.Ok(new { }, "Topic unfollowed."));
+    }
+
+    [HttpDelete("keyword/{keywordId:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> UnfollowKeyword(
+        Guid keywordId,
+        [FromQuery] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        await _followService.UnfollowKeywordAsync(userId, keywordId, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(new { }, "Keyword unfollowed."));
+    }
+
+    [HttpDelete("journal/{journalId:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> UnfollowJournal(
+        Guid journalId,
+        [FromQuery] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        await _followService.UnfollowJournalAsync(userId, journalId, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(new { }, "Journal unfollowed."));
     }
 }

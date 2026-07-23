@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Bookmark, BookmarkCheck, Loader2 } from 'lucide-react'
+import { ArrowLeft, Bookmark, BookmarkCheck, Loader2, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { addBookmark, getPaper, removeBookmark } from '../../services/paperService'
-import { getBookmarks } from '../../services/paperService'
+import {
+  addBookmark,
+  getBookmarks,
+  getPaper,
+  getPaperRecommendations,
+  removeBookmark,
+} from '../../services/paperService'
 
 export default function PaperDetailPage() {
   const { id } = useParams()
   const { user } = useAuth()
   const [paper, setPaper] = useState(null)
+  const [recommendations, setRecommendations] = useState([])
   const [bookmarked, setBookmarked] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -18,10 +24,12 @@ export default function PaperDetailPage() {
     setLoading(true)
     Promise.all([
       getPaper(id),
+      getPaperRecommendations(id, 5).catch(() => []),
       user?.id ? getBookmarks(user.id) : Promise.resolve([]),
     ])
-      .then(([p, bookmarks]) => {
+      .then(([p, recs, bookmarks]) => {
         setPaper(p)
+        setRecommendations(recs || [])
         setBookmarked((bookmarks || []).some((b) => b.paperId === id))
       })
       .catch((err) => setError(err.message))
@@ -85,6 +93,43 @@ export default function PaperDetailPage() {
         <TagList title="Authors" items={paper.authors} />
         <TagList title="Keywords" items={paper.keywords} />
         <TagList title="Topics" items={paper.topics} />
+      </section>
+
+      <section className="rounded-xl border border-border bg-surface p-6">
+        <h2 className="mb-1 flex items-center gap-2 font-semibold text-primary">
+          <Sparkles className="h-4 w-4 text-accent-primary" />
+          Recommended papers
+        </h2>
+        <p className="mb-4 text-xs text-muted">
+          Ranked by RecommendationService over gRPC (shared keywords / topics / journal)
+        </p>
+        {recommendations.length === 0 ? (
+          <p className="text-sm text-muted">No recommendations available. Is RecommendationService running on :5006?</p>
+        ) : (
+          <div className="space-y-3">
+            {recommendations.map((item) => (
+              <Link
+                key={item.paperId}
+                to={`/papers/${item.paperId}`}
+                className="block rounded-xl border border-border bg-elevated p-4 transition-colors hover:border-accent-primary/40"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-primary">{item.title}</p>
+                    <p className="mt-1 text-xs text-muted">
+                      {[item.journalName, item.publicationYear].filter(Boolean).join(' · ')}
+                      {(item.authors || []).length > 0 ? ` · ${item.authors.slice(0, 2).join(', ')}` : ''}
+                    </p>
+                    {item.reason && <p className="mt-2 text-xs text-accent-glow">{item.reason}</p>}
+                  </div>
+                  <span className="shrink-0 rounded-full bg-accent-primary/15 px-2.5 py-1 text-xs text-accent-glow">
+                    {(item.score * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )

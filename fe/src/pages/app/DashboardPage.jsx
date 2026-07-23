@@ -56,9 +56,12 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Papers" value={dashboard?.totalPapers ?? analytics?.totalPapers ?? 0} />
-        <StatCard label="Keywords Tracked" value={analytics?.keywordCount ?? topKeywords.length} />
-        <StatCard label="Years Covered" value={papersByYear.length} />
-        <StatCard label="Top Keyword" value={topKeywords[0]?.label ?? '—'} small />
+        <StatCard
+          label="Keywords Tracked"
+          value={analytics?.totalKeywords ?? topKeywords.length}
+        />
+        <StatCard label="Years Covered" value={papersByYear.length || ((analytics?.yearFrom && analytics?.yearTo) ? analytics.yearTo - analytics.yearFrom + 1 : 0)} />
+        <StatCard label="Top Keyword" value={analytics?.topKeyword || topKeywords[0]?.label || '—'} small />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

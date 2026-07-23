@@ -32,6 +32,21 @@ export async function followKeyword(userId, keywordId) {
   })
 }
 
+export async function followJournal(userId, journalId) {
+  return apiFetch('/api/follows/journal', {
+    method: 'POST',
+    body: JSON.stringify({ userId, journalId }),
+  })
+}
+
 export async function unfollowTopic(userId, topicId) {
   return apiFetch(`/api/follows/topic/${topicId}?userId=${userId}`, { method: 'DELETE' })
+}
+
+export async function unfollowKeyword(userId, keywordId) {
+  return apiFetch(`/api/follows/keyword/${keywordId}?userId=${userId}`, { method: 'DELETE' })
+}
+
+export async function unfollowJournal(userId, journalId) {
+  return apiFetch(`/api/follows/journal/${journalId}?userId=${userId}`, { method: 'DELETE' })
 }

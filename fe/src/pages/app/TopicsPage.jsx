@@ -1,24 +1,44 @@
 import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { getKeywords, getTopics } from '../../services/paperService'
-import { followKeyword, followTopic, getFollows, unfollowTopic } from '../../services/notificationService'
+import { getJournals, getKeywords, getTopics } from '../../services/paperService'
+import {
+  followJournal,
+  followKeyword,
+  followTopic,
+  getFollows,
+  unfollowJournal,
+  unfollowKeyword,
+  unfollowTopic,
+} from '../../services/notificationService'
 
 export default function TopicsPage() {
   const { user } = useAuth()
   const [topics, setTopics] = useState([])
   const [keywords, setKeywords] = useState([])
-  const [follows, setFollows] = useState({ topicIds: [], keywordIds: [] })
+  const [journals, setJournals] = useState([])
+  const [follows, setFollows] = useState({ topicIds: [], keywordIds: [], journalIds: [] })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const load = async () => {
     if (!user?.id) return
     try {
-      const [t, k, f] = await Promise.all([getTopics(), getKeywords(), getFollows(user.id)])
+      const [t, k, j, f] = await Promise.all([
+        getTopics(),
+        getKeywords(),
+        getJournals(),
+        getFollows(user.id),
+      ])
       setTopics(t || [])
       setKeywords(k || [])
-      setFollows({ topicIds: f?.topicIds || [], keywordIds: f?.keywordIds || [] })
+      setJournals(j || [])
+      setFollows({
+        topicIds: f?.topicIds || [],
+        keywordIds: f?.keywordIds || [],
+        journalIds: f?.journalIds || [],
+      })
+      setError('')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -47,10 +67,23 @@ export default function TopicsPage() {
   const toggleKeyword = async (keywordId) => {
     try {
       if (follows.keywordIds.includes(keywordId)) {
-        setError('Unfollow keyword via API not implemented on backend — follow only.')
-        return
+        await unfollowKeyword(user.id, keywordId)
+      } else {
+        await followKeyword(user.id, keywordId)
       }
-      await followKeyword(user.id, keywordId)
+      await load()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const toggleJournal = async (journalId) => {
+    try {
+      if (follows.journalIds.includes(journalId)) {
+        await unfollowJournal(user.id, journalId)
+      } else {
+        await followJournal(user.id, journalId)
+      }
       await load()
     } catch (err) {
       setError(err.message)
@@ -68,7 +101,7 @@ export default function TopicsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-bold text-primary">Follow Topics & Keywords</h1>
+        <h1 className="font-display text-2xl font-bold text-primary">Follow Topics, Keywords & Journals</h1>
         <p className="text-sm text-muted">Get notified when new papers match your interests</p>
       </div>
       {error && <div className="alert-error">{error}</div>}
@@ -109,6 +142,29 @@ export default function TopicsPage() {
               }`}
             >
               {k.name}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-3 font-semibold text-primary">Journals</h2>
+        <div className="grid gap-3 md:grid-cols-2">
+          {journals.map((j) => (
+            <button
+              key={j.id}
+              type="button"
+              onClick={() => toggleJournal(j.id)}
+              className={`rounded-xl border p-4 text-left transition-colors ${
+                follows.journalIds.includes(j.id)
+                  ? 'border-accent-green/50 bg-accent-green/10'
+                  : 'border-border bg-surface hover:border-accent-primary/40'
+              }`}
+            >
+              <p className="font-medium text-primary">{j.name}</p>
+              <p className="mt-1 text-xs text-muted">
+                {[j.issn, j.publisher].filter(Boolean).join(' · ') || 'Journal'}
+              </p>
             </button>
           ))}
         </div>

@@ -14,6 +14,11 @@ export async function getPaper(id) {
   return unwrap(res)
 }
 
+export async function getPaperRecommendations(id, limit = 5) {
+  const res = await apiFetch(`/api/papers/${id}/recommendations?limit=${limit}`)
+  return unwrap(res)
+}
+
 export async function getAuthors() {
   const res = await apiFetch('/api/authors')
   return unwrap(res)

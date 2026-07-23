@@ -17,4 +17,8 @@ public interface IPaperService
     Task<BookmarkResponse> AddBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default);
     Task RemoveBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<BookmarkResponse>> GetBookmarksAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<PaperRecommendationResponse>> GetRecommendationsAsync(
+        Guid paperId,
+        int limit = 5,
+        CancellationToken cancellationToken = default);
 }

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option csharp_namespace = "PRN232ASM.Recommendation.Grpc";
+
+package recommendation;
+
+service PaperRecommender {
+  rpc GetRecommendations (RecommendRequest) returns (RecommendReply);
+}
+
+message PaperCandidate {
+  string paper_id = 1;
+  string title = 2;
+  int32 publication_year = 3;
+  string journal_name = 4;
+  repeated string keywords = 5;
+  repeated string topics = 6;
+}
+
+message RecommendRequest {
+  string source_paper_id = 1;
+  int32 limit = 2;
+  repeated string source_keywords = 3;
+  repeated string source_topics = 4;
+  string source_journal_name = 5;
+  int32 source_year = 6;
+  repeated PaperCandidate candidates = 7;
+}
+
+message RecommendItem {
+  string paper_id = 1;
+  double score = 2;
+  string reason = 3;
+}
+
+message RecommendReply {
+  repeated RecommendItem items = 1;
+}

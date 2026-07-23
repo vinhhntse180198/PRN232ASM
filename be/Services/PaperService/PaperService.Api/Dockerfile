@@ -3,6 +3,7 @@ WORKDIR /src
 
 COPY BuildingBlocks/ BuildingBlocks/
 COPY Services/PaperService/ Services/PaperService/
+COPY Services/RecommendationService/Protos/ Services/RecommendationService/Protos/
 
 RUN dotnet restore Services/PaperService/PaperService.Api/PaperService.Api.csproj
 RUN dotnet publish Services/PaperService/PaperService.Api/PaperService.Api.csproj -c Release -o /app/publish /p:UseAppHost=false

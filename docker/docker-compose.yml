@@ -71,9 +71,24 @@ services:
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
+      RecommendationService__Address: http://recommendation-service:8080
     depends_on:
       rabbitmq:
         condition: service_healthy
+      recommendation-service:
+        condition: service_started
+
+  recommendation-service:
+    build:
+      context: ../be
+      dockerfile: Services/RecommendationService/Dockerfile
+    container_name: prn232asm-recommendation-service
+    ports:
+      - "5006:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
 
   trend-service:
     build:

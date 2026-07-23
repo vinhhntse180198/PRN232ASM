@@ -5,6 +5,7 @@ using PRN232ASM.BuildingBlocks.EventBus.Extensions;
 using PRN232ASM.PaperService.Application.Interfaces;
 using PRN232ASM.PaperService.Application.Services;
 using PRN232ASM.PaperService.Infrastructure.Eventing;
+using PRN232ASM.PaperService.Infrastructure.Grpc;
 using PRN232ASM.PaperService.Infrastructure.Persistence;
 
 namespace PRN232ASM.PaperService.Infrastructure;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPaperService, Application.Services.PaperService>();
         services.AddScoped<IPaperEventPublisher, PaperEventPublisher>();
+        services.AddSingleton<IRecommendationClient, RecommendationGrpcClient>();
 
         services.AddRabbitMqEventBus(configuration);
 
