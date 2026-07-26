@@ -16,7 +16,7 @@
 
 @layer components {
   .input-field {
-    @apply w-full rounded-xl border border-border bg-elevated px-4 py-2.5 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30;
+    @apply w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-primary placeholder:text-muted outline-none transition-colors focus:border-accent-primary/50 focus:ring-1 focus:ring-accent-primary/30;
   }
 
   .btn-primary {
@@ -24,17 +24,17 @@
   }
 
   .btn-secondary {
-    @apply rounded-xl border border-border bg-elevated px-4 py-2 text-sm text-muted transition-colors hover:border-accent-primary/40 hover:text-primary disabled:opacity-50;
+    @apply rounded-xl border border-border bg-surface px-4 py-2 text-sm text-muted transition-colors hover:border-accent-primary/40 hover:text-primary disabled:opacity-50;
   }
 
   .alert-error {
-    @apply rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300;
+    @apply rounded-xl border border-red-500/30 bg-red-50 px-4 py-3 text-sm text-red-700;
   }
 }
 
 @layer utilities {
   .dot-grid {
-    background-image: radial-gradient(rgba(241, 245, 249, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 

@@ -32,7 +32,7 @@ public class PaperImportClient : IPaperImportClient
             if (!response.IsSuccessStatusCode)
             {
                 var body = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogWarning("Paper import failed for {ExternalId}: {Status} {Body}", request.ExternalId, response.StatusCode, body);
+                _logger.LogWarning("Paper import failed for {Title}: {Status} {Body}", request.Title, response.StatusCode, body);
                 return PaperImportResult.Failed;
             }
 
@@ -40,8 +40,37 @@ public class PaperImportClient : IPaperImportClient
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Paper import request failed for {ExternalId}", request.ExternalId);
+            _logger.LogWarning(ex, "Paper import request failed for {Title}", request.Title);
             return PaperImportResult.Failed;
+        }
+    }
+
+    public async Task<Guid?> GetCreatedPaperIdAsync(PaperImportRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _http.PostAsJsonAsync("api/papers/import", request, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.Conflict)
+                return null;
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Paper import failed for {Title}: {Status}", request.Title, response.StatusCode);
+                return null;
+            }
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = System.Text.Json.JsonDocument.Parse(body);
+            var root = doc.RootElement;
+
+            Guid.TryParse(root.GetProperty("data").GetProperty("id").GetString(), out var paperId);
+            return paperId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Paper import request failed for {Title}", request.Title);
+            return null;
         }
     }
 }

@@ -1,10 +1,11 @@
 import { apiFetch, unwrap } from '../lib/api'
 
-export async function searchPapers({ page = 1, pageSize = 20, keyword, author, journal } = {}) {
+export async function searchPapers({ page = 1, pageSize = 20, keyword, author, journal, topicId } = {}) {
   const params = new URLSearchParams({ page, pageSize })
   if (keyword) params.set('keyword', keyword)
   if (author) params.set('author', author)
   if (journal) params.set('journal', journal)
+  if (topicId) params.set('topicId', topicId)
   const res = await apiFetch(`/api/papers?${params}`)
   return unwrap(res)
 }
@@ -34,8 +35,8 @@ export async function getTopics() {
   return unwrap(res)
 }
 
-export async function getBookmarks(userId) {
-  const res = await apiFetch(`/api/bookmarks?userId=${userId}`)
+export async function getBookmarks() {
+  const res = await apiFetch('/api/bookmarks')
   return unwrap(res)
 }
 

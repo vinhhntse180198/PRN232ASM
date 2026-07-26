@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useNavbarScroll } from '../../hooks/useNavbarScroll'
 
-const links = ['Features', 'Partners', 'Pricing', 'Case Studies']
+const links = ['Features', 'How It Works', 'Research Topics', 'Dashboard']
 
 export default function Navbar() {
   const scrolled = useNavbarScroll()
@@ -14,7 +14,7 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-primary">
-          Collective OS
+          SciTrend
           <span className="h-2 w-2 rounded-full bg-accent-primary shadow-glow-sm" />
         </Link>
 

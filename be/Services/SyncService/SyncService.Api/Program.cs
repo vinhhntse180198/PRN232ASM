@@ -11,9 +11,13 @@ if (!string.Equals(builder.Configuration["USE_SUPABASE_DB"], "true", StringCompa
 {
     builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
     {
-        ["ConnectionStrings:DefaultConnection"] = "Data Source=sync.db",
-        ["OpenAlex:Enabled"] = "false"
+        ["ConnectionStrings:DefaultConnection"] = "Data Source=sync.db"
     });
+}
+
+if (!string.Equals(builder.Configuration["OpenAlex:Enabled"], "true", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Configuration["OpenAlex:Enabled"] = "false";
 }
 
 builder.Services.AddControllers();

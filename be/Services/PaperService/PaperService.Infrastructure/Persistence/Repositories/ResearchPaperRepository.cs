@@ -51,6 +51,7 @@ public class ResearchPaperRepository : IResearchPaperRepository
         string? keyword,
         string? author,
         string? journal,
+        Guid? topicId = null,
         CancellationToken cancellationToken = default)
     {
         var query = _context.ResearchPapers
@@ -79,6 +80,11 @@ public class ResearchPaperRepository : IResearchPaperRepository
         {
             var term = journal.Trim().ToLower();
             query = query.Where(p => p.Journal.Name.ToLower().Contains(term));
+        }
+
+        if (topicId.HasValue)
+        {
+            query = query.Where(p => p.PaperTopics.Any(pt => pt.TopicId == topicId.Value));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);

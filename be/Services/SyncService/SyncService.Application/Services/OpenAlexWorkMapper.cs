@@ -11,15 +11,16 @@ public static class OpenAlexWorkMapper
         if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(work.Id))
             return null;
 
+        var url = GetSourceUrl(work);
+
         return new PaperImportRequest(
-            ExternalId: work.Id,
             Title: title,
             Abstract: ReconstructAbstract(work.AbstractInvertedIndex),
-            PublicationYear: work.PublicationYear,
+            PublicationYear: work.PublicationYear ?? 0,
             Doi: NormalizeDoi(work.Doi),
             CitationCount: work.CitedByCount,
-            JournalName: work.PrimaryLocation?.Source?.DisplayName,
-            AuthorNames: work.Authorships
+            JournalName: work.PrimaryLocation?.Source?.DisplayName ?? "Unknown",
+            Authors: work.Authorships
                 .Select(a => a.Author?.DisplayName)
                 .Where(n => !string.IsNullOrWhiteSpace(n))
                 .Select(n => n!)
@@ -36,7 +37,61 @@ public static class OpenAlexWorkMapper
                 .Where(n => !string.IsNullOrWhiteSpace(n))
                 .Select(n => n!)
                 .Distinct()
-                .ToList());
+                .ToList(),
+            Url: url,
+            PdfUrl: GetPdfUrl(work));
+    }
+
+    private static string? GetSourceUrl(OpenAlexWork work)
+    {
+        var primary = work.PrimaryLocation?.LandingPageUrl;
+        if (IsRealUrl(primary))
+            return primary;
+
+        var relatedUrl = work.RelatedUrls?
+            .FirstOrDefault(u => u.RelationshipType == "publisher" || u.RelationshipType == "host_venue")
+            ?.Url;
+        if (IsRealUrl(relatedUrl))
+            return relatedUrl;
+
+        return GetOpenAlexUrl(work);
+    }
+
+    private static string? GetPdfUrl(OpenAlexWork work)
+    {
+        var oaLocation = work.BestOaLocation;
+        if (oaLocation is null) return null;
+
+        if (IsRealUrl(oaLocation.PdfUrl))
+            return oaLocation.PdfUrl;
+
+        if (IsRealUrl(oaLocation.LandingPageUrl))
+            return oaLocation.LandingPageUrl;
+
+        return null;
+    }
+
+    private static bool IsRealUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return false;
+        var trimmed = url.Trim().TrimEnd(',', ';', '.', '>');
+        if (trimmed.StartsWith("https://web.archive.org/", StringComparison.OrdinalIgnoreCase)) return false;
+        return Uri.TryCreate(trimmed, UriKind.Absolute, out var uri)
+               && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+    }
+
+    private static string? GetOpenAlexUrl(OpenAlexWork work)
+    {
+        if (string.IsNullOrWhiteSpace(work.Id)) return null;
+        return work.Id.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+            ? work.Id
+            : $"https://openalex.org/{work.Id}";
+    }
+
+    private static string? ResolveDoiUrl(string? doi)
+    {
+        if (string.IsNullOrWhiteSpace(doi)) return null;
+        return $"https://doi.org/{NormalizeDoi(doi)}";
     }
 
     private static string? ReconstructAbstract(Dictionary<string, List<int>>? invertedIndex)

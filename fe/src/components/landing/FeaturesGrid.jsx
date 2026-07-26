@@ -1,13 +1,13 @@
-import { BarChart2, Globe, Network, Shield, Zap, Target } from 'lucide-react'
+import { BarChart2, Globe, BookOpen, Shield, TrendingUp, Target } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const features = [
-  { icon: Shield, title: 'Vetted Network', desc: 'Every partner is verified for quality, reliability, and track record.' },
-  { icon: BarChart2, title: 'Revenue Tracking', desc: 'Monitor pipeline value, win rates, and partner ROI in real time.' },
-  { icon: Globe, title: 'Global Reach', desc: 'Access agencies across 41 countries without opening new offices.' },
-  { icon: Zap, title: 'Lightning Fast', desc: 'Match with qualified partners in hours, not months of outreach.' },
-  { icon: Target, title: 'Smart Matching', desc: 'AI scores fit based on skills, industry, and deal history.' },
-  { icon: Network, title: 'Deep Analytics', desc: 'Insights on partner performance, trends, and growth opportunities.' },
+  { icon: TrendingUp, title: 'Publication Trends', desc: 'Visualize research output over time with interactive charts and keyword-based trend analysis.' },
+  { icon: BookOpen, title: 'Paper Discovery', desc: 'Search and filter thousands of scientific papers by keyword, author, journal, and publication year.' },
+  { icon: Globe, title: 'Multi-Source Data', desc: 'Aggregate metadata from academic APIs including Semantic Scholar, OpenAlex, and Crossref.' },
+  { icon: Target, title: 'Topic Tracking', desc: 'Follow research topics and receive alerts when new papers matching your interests are published.' },
+  { icon: Shield, title: 'Curated Datasets', desc: 'High-quality metadata including titles, abstracts, keywords, authors, and journal information.' },
+  { icon: BarChart2, title: 'Deep Analytics', desc: 'Insights on journal impact, keyword frequency, and emerging research areas over time.' },
 ]
 
 export default function FeaturesGrid() {
@@ -16,8 +16,9 @@ export default function FeaturesGrid() {
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Why Agencies Choose Us
+            Built for Research Analysis
           </h2>
+          <p className="mt-2 text-center text-sm text-muted">From keyword trends to journal impact — all in one platform</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -122,26 +122,25 @@ public class SyncAppService : ISyncService
                     var request = OpenAlexWorkMapper.ToImportRequest(work);
                     if (request is null) continue;
 
-                    var result = await _paperImportClient.ImportAsync(request, cancellationToken);
-                    if (result == PaperImportResult.Created)
+                    var paperId = await _paperImportClient.GetCreatedPaperIdAsync(request, cancellationToken);
+                    if (paperId.HasValue)
                     {
                         imported++;
-                        var paperId = Guid.NewGuid();
 
                         await _eventBus.PublishAsync(new PaperImportedEvent
                         {
-                            PaperId = paperId,
+                            PaperId = paperId.Value,
                             Title = request.Title,
                             SourceName = source.Name
                         }, cancellationToken);
 
                         await _eventBus.PublishAsync(new NewPaperDetectedEvent
                         {
-                            PaperId = paperId,
+                            PaperId = paperId.Value,
                             Title = request.Title
                         }, cancellationToken);
                     }
-                    else if (result == PaperImportResult.SkippedDuplicate)
+                    else
                     {
                         skipped++;
                     }

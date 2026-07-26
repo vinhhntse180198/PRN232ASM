@@ -42,6 +42,10 @@ public class FollowAppService : IFollowService
 
     public async Task FollowKeywordAsync(FollowKeywordRequest request, CancellationToken cancellationToken = default)
     {
+        var existing = await _unitOfWork.Follows.GetKeywordFollowAsync(request.UserId, request.KeywordId, cancellationToken);
+        if (existing is not null)
+            throw new ValidationException("User already follows this keyword.");
+
         await _unitOfWork.Follows.AddKeywordFollowAsync(new FollowKeyword
         {
             UserId = request.UserId,
@@ -58,6 +62,40 @@ public class FollowAppService : IFollowService
             ?? throw new NotFoundException("FollowTopic", $"{userId}/{topicId}");
 
         await _unitOfWork.Follows.RemoveTopicFollowAsync(userId, topicId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UnfollowKeywordAsync(Guid userId, Guid keywordId, CancellationToken cancellationToken = default)
+    {
+        var existing = await _unitOfWork.Follows.GetKeywordFollowAsync(userId, keywordId, cancellationToken)
+            ?? throw new NotFoundException("FollowKeyword", $"{userId}/{keywordId}");
+
+        await _unitOfWork.Follows.RemoveKeywordFollowAsync(userId, keywordId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task FollowJournalAsync(FollowJournalRequest request, CancellationToken cancellationToken = default)
+    {
+        var existing = await _unitOfWork.Follows.GetJournalFollowAsync(request.UserId, request.JournalId, cancellationToken);
+        if (existing is not null)
+            throw new ValidationException("User already follows this journal.");
+
+        await _unitOfWork.Follows.AddJournalFollowAsync(new FollowJournal
+        {
+            UserId = request.UserId,
+            JournalId = request.JournalId,
+            CreatedAt = DateTime.UtcNow
+        }, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UnfollowJournalAsync(Guid userId, Guid journalId, CancellationToken cancellationToken = default)
+    {
+        var existing = await _unitOfWork.Follows.GetJournalFollowAsync(userId, journalId, cancellationToken)
+            ?? throw new NotFoundException("FollowJournal", $"{userId}/{journalId}");
+
+        await _unitOfWork.Follows.RemoveJournalFollowAsync(userId, journalId, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

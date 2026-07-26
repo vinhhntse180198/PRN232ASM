@@ -23,6 +23,7 @@ public class PapersController : ControllerBase
         [FromQuery] string? keyword = null,
         [FromQuery] string? author = null,
         [FromQuery] string? journal = null,
+        [FromQuery] Guid? topicId = null,
         CancellationToken cancellationToken = default)
     {
         var result = await _paperService.SearchAsync(new SearchPaperRequest
@@ -31,7 +32,8 @@ public class PapersController : ControllerBase
             PageSize = pageSize,
             Keyword = keyword,
             Author = author,
-            Journal = journal
+            Journal = journal,
+            TopicId = topicId
         }, cancellationToken);
 
         return Ok(ApiResponse<object>.Ok(result));
@@ -46,6 +48,15 @@ public class PapersController : ControllerBase
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse<object>>> Create(
+        [FromBody] CreatePaperRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var paper = await _paperService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = paper.Id }, ApiResponse<object>.Ok(paper));
+    }
+
+    [HttpPost("import")]
+    public async Task<ActionResult<ApiResponse<object>>> Import(
         [FromBody] CreatePaperRequest request,
         CancellationToken cancellationToken = default)
     {

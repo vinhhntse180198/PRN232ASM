@@ -23,6 +23,16 @@ public class AuthorRepository : IAuthorRepository
         return await _context.Authors.AsNoTracking().OrderBy(a => a.Name).ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Author>> GetAllDistinctAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Authors
+            .AsNoTracking()
+            .GroupBy(a => a.Name.ToLower())
+            .Select(g => g.First())
+            .OrderBy(a => a.Name)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Author?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         return await _context.Authors.FirstOrDefaultAsync(a => a.Name == name, cancellationToken);

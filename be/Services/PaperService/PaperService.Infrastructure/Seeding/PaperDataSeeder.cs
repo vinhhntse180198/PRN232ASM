@@ -55,7 +55,7 @@ public static class PaperDataSeeder
 
         await context.Database.EnsureCreatedAsync(cancellationToken);
 
-        if (await context.ResearchPapers.CountAsync(cancellationToken) >= 303)
+        if (await context.ResearchPapers.CountAsync(cancellationToken) > 0)
         {
             return;
         }

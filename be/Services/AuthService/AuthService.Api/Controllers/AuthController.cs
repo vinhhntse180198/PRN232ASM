@@ -48,4 +48,26 @@ public class AuthController : ControllerBase
         await _authService.LogoutAsync(request.RefreshToken, cancellationToken);
         return Ok(ApiResponse<object>.Ok(new { }, "Logout successful"));
     }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse<object>>> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+        await _authService.ChangePasswordAsync(userId, request.CurrentPassword, request.NewPassword, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(new { }, "Password changed successfully."));
+    }
+
+    private Guid GetUserId()
+    {
+        if (Request.Headers.TryGetValue("X-User-Id", out var headerValue) &&
+            Guid.TryParse(headerValue.FirstOrDefault(), out var userId) &&
+            userId != Guid.Empty)
+        {
+            return userId;
+        }
+        throw new UnauthorizedAccessException("X-User-Id header is required.");
+    }
 }

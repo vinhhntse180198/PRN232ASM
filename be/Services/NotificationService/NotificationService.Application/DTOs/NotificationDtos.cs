@@ -11,6 +11,7 @@ public record NotificationDto(
 
 public record FollowTopicRequest(Guid UserId, Guid TopicId);
 public record FollowKeywordRequest(Guid UserId, Guid KeywordId);
+public record FollowJournalRequest(Guid UserId, Guid JournalId);
 
 public record FollowsSummaryDto(
     IReadOnlyList<Guid> TopicIds,

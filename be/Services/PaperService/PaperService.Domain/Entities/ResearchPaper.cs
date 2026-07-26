@@ -10,6 +10,8 @@ public class ResearchPaper
     public int CitationCount { get; set; }
     public Guid JournalId { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? Url { get; set; }
+    public string? PdfUrl { get; set; }
 
     public Journal Journal { get; set; } = null!;
     public ICollection<PaperAuthor> PaperAuthors { get; set; } = new List<PaperAuthor>();

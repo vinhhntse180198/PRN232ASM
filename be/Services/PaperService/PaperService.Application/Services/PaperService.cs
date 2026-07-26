@@ -33,6 +33,7 @@ public class PaperService : IPaperService
             request.Keyword,
             request.Author,
             request.Journal,
+            request.TopicId,
             cancellationToken);
 
         return new PagedResult<PaperSummaryResponse>
@@ -77,7 +78,9 @@ public class PaperService : IPaperService
             CitationCount = request.CitationCount,
             JournalId = journal.Id,
             Journal = journal,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Url = request.Url,
+            PdfUrl = request.PdfUrl
         };
 
         var authorOrder = 1;
@@ -155,9 +158,14 @@ public class PaperService : IPaperService
             PublicationYear = paper.PublicationYear,
             TopicId = primaryTopic?.Id,
             TopicName = primaryTopic?.Name,
+            TopicIds = paper.PaperTopics.Select(pt => pt.TopicId).ToList(),
+            KeywordIds = paper.PaperKeywords.Select(pk => pk.KeywordId).ToList(),
             Keywords = paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
             Authors = paper.PaperAuthors.OrderBy(pa => pa.AuthorOrder).Select(pa => pa.Author.Name).ToList(),
-            JournalName = journal.Name
+            JournalId = journal.Id,
+            JournalName = journal.Name,
+            Url = paper.Url,
+            PdfUrl = paper.PdfUrl
         }, cancellationToken);
 
         return _mapper.Map<PaperDetailResponse>(paper);

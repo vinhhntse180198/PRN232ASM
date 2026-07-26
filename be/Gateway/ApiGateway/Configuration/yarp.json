@@ -69,27 +69,27 @@
     "Clusters": {
       "auth-cluster": {
         "Destinations": {
-          "auth": { "Address": "http://localhost:5131" }
+          "auth": { "Address": "http://auth-service:8080" }
         }
       },
       "paper-cluster": {
         "Destinations": {
-          "paper": { "Address": "http://localhost:5002" }
+          "paper": { "Address": "http://paper-service:8080" }
         }
       },
       "trend-cluster": {
         "Destinations": {
-          "trend": { "Address": "http://localhost:5003" }
+          "trend": { "Address": "http://trend-service:8080" }
         }
       },
       "notification-cluster": {
         "Destinations": {
-          "notification": { "Address": "http://localhost:5004" }
+          "notification": { "Address": "http://notification-service:8080" }
         }
       },
       "sync-cluster": {
         "Destinations": {
-          "sync": { "Address": "http://localhost:5005" }
+          "sync": { "Address": "http://sync-service:8080" }
         }
       }
     }

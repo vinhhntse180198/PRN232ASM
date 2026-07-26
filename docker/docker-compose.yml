@@ -23,6 +23,7 @@ services:
       - "5000:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
       JWT__Issuer: PRN232ASM
       JWT__Audience: PRN232ASM-Users
@@ -47,6 +48,7 @@ services:
       - "5131:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
       JWT__Issuer: PRN232ASM
       JWT__Audience: PRN232ASM-Users
@@ -67,6 +69,7 @@ services:
       - "5002:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
@@ -84,13 +87,18 @@ services:
       - "5003:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
+      PaperService__BaseUrl: http://paper-service:8080
+      JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
     depends_on:
       rabbitmq:
         condition: service_healthy
+      paper-service:
+        condition: service_started
 
   notification-service:
     build:
@@ -101,6 +109,7 @@ services:
       - "5004:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Data Source=/data/notify.db
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
@@ -121,8 +130,13 @@ services:
       - "5005:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Data Source=/data/sync.db
-      OpenAlex__Enabled: "false"
+      OpenAlex__Enabled: "true"
+      OpenAlex__BaseUrl: "https://api.openalex.org"
+      OpenAlex__DefaultYear: "2024"
+      OpenAlex__DefaultYears: "2024"
+      OpenAlex__MaxImportCount: "200"
       OpenAlex__ApiKey: ""
       PaperService__BaseUrl: http://paper-service:8080
       RabbitMQ__Host: rabbitmq

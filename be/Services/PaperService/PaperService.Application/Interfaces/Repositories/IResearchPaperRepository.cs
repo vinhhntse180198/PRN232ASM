@@ -11,6 +11,7 @@ public interface IResearchPaperRepository
         string? keyword,
         string? author,
         string? journal,
+        Guid? topicId = null,
         CancellationToken cancellationToken = default);
 
     Task<ResearchPaper?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);

@@ -15,4 +15,6 @@ public class PaperCreatedEvent : IntegrationEvent
     public IReadOnlyList<Guid> KeywordIds { get; set; } = Array.Empty<Guid>();
     public IReadOnlyList<string> Keywords { get; set; } = Array.Empty<string>();
     public IReadOnlyList<string> Authors { get; set; } = Array.Empty<string>();
+    public string? Url { get; set; }
+    public string? PdfUrl { get; set; }
 }

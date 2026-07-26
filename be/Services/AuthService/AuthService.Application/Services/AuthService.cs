@@ -121,6 +121,25 @@ public class AuthService : IAuthService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task ChangePasswordAsync(Guid userId, string currentPassword, string newPassword, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword))
+            throw new ValidationException("Current and new passwords are required.");
+
+        if (newPassword.Length < 8)
+            throw new ValidationException("New password must be at least 8 characters.");
+
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
+            ?? throw new NotFoundException("User", userId);
+
+        if (!_passwordHasher.Verify(currentPassword, user.PasswordHash))
+            throw new ValidationException("Current password is incorrect.");
+
+        user.PasswordHash = _passwordHasher.Hash(newPassword);
+        _userRepository.Update(user);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     private static void ValidateRegistration(string fullName, string email, string password)
     {
         if (string.IsNullOrWhiteSpace(fullName))

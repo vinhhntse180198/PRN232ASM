@@ -4,24 +4,24 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const faqs = [
   {
-    q: 'How does Collective OS match agencies?',
-    a: 'Our AI analyzes your agency profile, skills, industry focus, and deal history to surface partners with the highest compatibility score. Matches are ranked by fit, availability, and past collaboration success.',
+    q: 'What data sources does SciTrend use?',
+    a: 'SciTrend aggregates metadata from academic APIs including Semantic Scholar, OpenAlex, and Crossref. We collect paper titles, abstracts, keywords, publication years, authors, and journal information — no full-text content is stored.',
   },
   {
-    q: 'Is there a free plan available?',
-    a: 'Yes. Start free with up to 5 partner matches per month, basic analytics, and access to our vetted network. Upgrade anytime for unlimited matching and advanced pipeline tools.',
+    q: 'How does keyword trend tracking work?',
+    a: 'You can follow specific keywords or research topics. The system monitors new publications and sends notifications when papers matching your interests are published. Trends are recalculated every 6 hours from the latest data.',
   },
   {
-    q: 'How long does it take to find a partner?',
-    a: 'Most agencies receive their first qualified matches within 24 hours of completing their profile. High-priority matches often surface in under 4 hours.',
+    q: 'What research domains are covered?',
+    a: 'SciTrend currently focuses on curated datasets from Computer Science and AI research. The admin can configure additional data sources and research domains through the system settings.',
   },
   {
-    q: 'What types of agencies use Collective OS?',
-    a: 'Branding, web development, SEO, content, video, and full-service digital agencies across B2B and B2C. We support boutiques to 200+ person teams.',
+    q: 'Can I export or generate reports?',
+    a: 'Yes. Both regular users and administrators can generate trend reports showing publication counts, top keywords, and growth analysis for any time period in the dataset.',
   },
   {
-    q: 'Can I manage deals directly on the platform?',
-    a: 'Absolutely. Track opportunities from discovery through proposal to won — with shared workspaces, messaging, and revenue reporting built in.',
+    q: 'How often is the paper database updated?',
+    a: 'Data synchronization runs daily via the OpenAlex API when enabled by the administrator. Manual sync can also be triggered from the admin panel at any time.',
   },
 ]
 

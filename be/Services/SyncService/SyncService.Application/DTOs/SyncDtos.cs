@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SyncService.Application.DTOs;
 
 public record DataSourceDto(
@@ -30,13 +32,14 @@ public record SyncStatusDto(
     IReadOnlyList<DataSourceDto> DataSources);
 
 public record PaperImportRequest(
-    string ExternalId,
-    string Title,
-    string? Abstract,
-    int? PublicationYear,
-    string? Doi,
-    int CitationCount,
-    string? JournalName,
-    IReadOnlyList<string> AuthorNames,
-    IReadOnlyList<string> Keywords,
-    IReadOnlyList<string> Topics);
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("abstract")] string? Abstract,
+    [property: JsonPropertyName("doi")] string? Doi,
+    [property: JsonPropertyName("publicationYear")] int? PublicationYear,
+    [property: JsonPropertyName("citationCount")] int CitationCount,
+    [property: JsonPropertyName("journalName")] string? JournalName,
+    [property: JsonPropertyName("authors")] IReadOnlyList<string> Authors,
+    [property: JsonPropertyName("keywords")] IReadOnlyList<string> Keywords,
+    [property: JsonPropertyName("topics")] IReadOnlyList<string> Topics,
+    [property: JsonPropertyName("url")] string? Url = null,
+    [property: JsonPropertyName("pdfUrl")] string? PdfUrl = null);
