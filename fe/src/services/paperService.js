@@ -15,6 +15,36 @@ export async function getPaper(id) {
   return unwrap(res)
 }
 
+export async function getPaperRecommendations(id, limit = 5) {
+  const res = await apiFetch(`/api/papers/${id}/recommendations?limit=${limit}`)
+  return unwrap(res)
+}
+
+export async function getPaperImpactScore(id) {
+  const res = await apiFetch(`/api/papers/${id}/impact-score`)
+  return unwrap(res)
+}
+
+export async function getPaperInsights(id) {
+  const res = await apiFetch(`/api/papers/${id}/insights`)
+  return unwrap(res)
+}
+
+export async function getJournalCapacity(id, year) {
+  const params = year ? `?year=${year}` : ''
+  const res = await apiFetch(`/api/journals/${id}/capacity${params}`)
+  return unwrap(res)
+}
+
+export async function getReadingProfile(userId, { followedKeywords, followedTopics, followedJournals } = {}) {
+  const params = new URLSearchParams({ userId })
+  ;(followedKeywords || []).forEach((k) => params.append('followedKeywords', k))
+  ;(followedTopics || []).forEach((t) => params.append('followedTopics', t))
+  ;(followedJournals || []).forEach((j) => params.append('followedJournals', j))
+  const res = await apiFetch(`/api/bookmarks/reading-profile?${params}`)
+  return unwrap(res)
+}
+
 export async function getAuthors() {
   const res = await apiFetch('/api/authors')
   return unwrap(res)

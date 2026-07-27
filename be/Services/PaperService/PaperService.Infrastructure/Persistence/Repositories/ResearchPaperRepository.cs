@@ -24,6 +24,18 @@ public class ResearchPaperRepository : IResearchPaperRepository
         return await _context.ResearchPapers.CountAsync(cancellationToken);
     }
 
+    public async Task<bool> ExistsByDoiOrTitleAsync(string? doi, string title, CancellationToken cancellationToken = default)
+    {
+        if (!string.IsNullOrWhiteSpace(doi))
+        {
+            var normalizedDoi = doi.Trim();
+            return await _context.ResearchPapers.AnyAsync(p => p.Doi == normalizedDoi, cancellationToken);
+        }
+
+        var normalizedTitle = title.Trim();
+        return await _context.ResearchPapers.AnyAsync(p => p.Title == normalizedTitle, cancellationToken);
+    }
+
     public async Task<ResearchPaper?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.ResearchPapers

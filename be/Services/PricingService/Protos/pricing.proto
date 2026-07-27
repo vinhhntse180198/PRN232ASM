@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "PRN232ASM.Pricing.Grpc";
+
+package pricing;
+
+service PaperPricer {
+  rpc ComputeImpactScore (ImpactScoreRequest) returns (ImpactScoreReply);
+}
+
+message ImpactScoreRequest {
+  string paper_id = 1;
+  string title = 2;
+  int32 publication_year = 3;
+  int32 citation_count = 4;
+  int32 keyword_count = 5;
+  int32 topic_count = 6;
+  int32 author_count = 7;
+  string journal_name = 8;
+}
+
+message ImpactScoreReply {
+  string paper_id = 1;
+  double score = 2;
+  string currency_label = 3;
+  string tier = 4;
+  string explanation = 5;
+}

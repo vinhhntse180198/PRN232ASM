@@ -9,6 +9,7 @@ public interface IPaperService
     Task<PagedResult<PaperSummaryResponse>> SearchAsync(SearchPaperRequest request, CancellationToken cancellationToken = default);
     Task<PaperDetailResponse> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<PaperDetailResponse> CreateAsync(CreatePaperRequest request, CancellationToken cancellationToken = default);
+    Task<bool> ImportAsync(ImportPaperRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<AuthorResponse>> GetAuthorsAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<JournalResponse>> GetJournalsAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<KeywordResponse>> GetKeywordsAsync(CancellationToken cancellationToken = default);
@@ -16,4 +17,17 @@ public interface IPaperService
     Task<BookmarkResponse> AddBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default);
     Task RemoveBookmarkAsync(Guid userId, Guid paperId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<BookmarkResponse>> GetBookmarksAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<PaperRecommendationResponse>> GetRecommendationsAsync(
+        Guid paperId,
+        int limit = 5,
+        CancellationToken cancellationToken = default);
+    Task<PaperImpactScoreResponse> GetImpactScoreAsync(Guid paperId, CancellationToken cancellationToken = default);
+    Task<PaperInsightResponse> GetInsightsAsync(Guid paperId, CancellationToken cancellationToken = default);
+    Task<JournalCapacityResponse> GetJournalCapacityAsync(Guid journalId, int? year = null, CancellationToken cancellationToken = default);
+    Task<ReadingProfileResponse> GetReadingProfileAsync(
+        Guid userId,
+        IReadOnlyList<string>? followedKeywords = null,
+        IReadOnlyList<string>? followedTopics = null,
+        IReadOnlyList<string>? followedJournals = null,
+        CancellationToken cancellationToken = default);
 }

@@ -21,4 +21,17 @@ public class JournalsController : ControllerBase
         var journals = await _paperService.GetJournalsAsync(cancellationToken);
         return Ok(ApiResponse<object>.Ok(journals));
     }
+
+    /// <summary>
+    /// REST → InventoryService gRPC (journal yearly capacity from Paper DB counts).
+    /// </summary>
+    [HttpGet("{id:guid}/capacity")]
+    public async Task<ActionResult<ApiResponse<object>>> GetCapacity(
+        Guid id,
+        [FromQuery] int? year = null,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _paperService.GetJournalCapacityAsync(id, year, cancellationToken);
+        return Ok(ApiResponse<object>.Ok(result));
+    }
 }
