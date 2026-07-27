@@ -3,19 +3,19 @@ using NotificationService.Application.Interfaces;
 using NotificationService.Domain.Entities;
 using PRN232ASM.BuildingBlocks.Common.Exceptions;
 using PRN232ASM.BuildingBlocks.Contracts.Notifications;
-using PRN232ASM.BuildingBlocks.EventBus.Abstractions;
+using PRN232ASM.BuildingBlocks.EventBus.Outbox;
 
 namespace NotificationService.Application.Services;
 
 public class FollowAppService : IFollowService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IEventBus _eventBus;
+    private readonly IOutboxWriter _outbox;
 
-    public FollowAppService(IUnitOfWork unitOfWork, IEventBus eventBus)
+    public FollowAppService(IUnitOfWork unitOfWork, IOutboxWriter outbox)
     {
         _unitOfWork = unitOfWork;
-        _eventBus = eventBus;
+        _outbox = outbox;
     }
 
     public async Task FollowTopicAsync(FollowTopicRequest request, CancellationToken cancellationToken = default)
@@ -31,13 +31,13 @@ public class FollowAppService : IFollowService
             CreatedAt = DateTime.UtcNow
         }, cancellationToken);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await _eventBus.PublishAsync(new UserFollowedTopicEvent
+        await _outbox.EnqueueAsync(new UserFollowedTopicEvent
         {
             UserId = request.UserId,
             TopicId = request.TopicId
         }, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task FollowKeywordAsync(FollowKeywordRequest request, CancellationToken cancellationToken = default)
@@ -50,22 +50,6 @@ public class FollowAppService : IFollowService
         {
             UserId = request.UserId,
             KeywordId = request.KeywordId,
-            CreatedAt = DateTime.UtcNow
-        }, cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task FollowJournalAsync(FollowJournalRequest request, CancellationToken cancellationToken = default)
-    {
-        var existing = await _unitOfWork.Follows.GetJournalFollowAsync(request.UserId, request.JournalId, cancellationToken);
-        if (existing is not null)
-            throw new ValidationException("User already follows this journal.");
-
-        await _unitOfWork.Follows.AddJournalFollowAsync(new FollowJournal
-        {
-            UserId = request.UserId,
-            JournalId = request.JournalId,
             CreatedAt = DateTime.UtcNow
         }, cancellationToken);
 
@@ -87,6 +71,22 @@ public class FollowAppService : IFollowService
             ?? throw new NotFoundException("FollowKeyword", $"{userId}/{keywordId}");
 
         await _unitOfWork.Follows.RemoveKeywordFollowAsync(userId, keywordId, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task FollowJournalAsync(FollowJournalRequest request, CancellationToken cancellationToken = default)
+    {
+        var existing = await _unitOfWork.Follows.GetJournalFollowAsync(request.UserId, request.JournalId, cancellationToken);
+        if (existing is not null)
+            throw new ValidationException("User already follows this journal.");
+
+        await _unitOfWork.Follows.AddJournalFollowAsync(new FollowJournal
+        {
+            UserId = request.UserId,
+            JournalId = request.JournalId,
+            CreatedAt = DateTime.UtcNow
+        }, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

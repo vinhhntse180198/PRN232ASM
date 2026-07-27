@@ -1,42 +1,44 @@
-import { Bell, Search, TrendingUp } from 'lucide-react'
+import { Search, TrendingUp, Bell } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const steps = [
   {
     num: '01',
     icon: Search,
-    title: 'Search the Literature',
-    desc: 'Look up papers by keyword, author, or journal in seconds.',
+    title: 'Search & Discover Papers',
+    desc: 'Filter thousands of scientific publications by keyword, author, journal, or publication year.',
     preview: (
-      <div className="mt-4 rounded-lg border border-border bg-base/60 p-3">
-        <p className="text-xs font-semibold text-primary">Attention Is All You Need</p>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {['Transformers', 'NLP', 'Deep Learning'].map((t) => (
-            <span key={t} className="rounded-full bg-accent-primary/10 px-2 py-0.5 text-[10px] text-accent-glow">
-              {t}
-            </span>
-          ))}
+      <div className="mt-4 space-y-2 rounded-lg border border-border bg-base/60 p-3">
+        <div className="rounded-md bg-elevated px-2 py-1.5 text-[10px] text-muted">
+          Search: &quot;machine learning + 2024&quot;
         </div>
-        <p className="mt-2 text-[10px] text-accent-amber">★ 120,000+ citations · 2017</p>
+        {[
+          { title: 'Attention Is All You Need', journal: 'NeurIPS', year: 2024 },
+          { title: 'Deep Learning for NLP', journal: 'ACL', year: 2024 },
+          { title: 'Neural Architecture Search', journal: 'ICML', year: 2024 },
+        ].map((r) => (
+          <div key={r.title} className="flex flex-col text-[10px]">
+            <span className="font-medium text-primary">{r.title}</span>
+            <span className="text-muted">{r.journal} · {r.year}</span>
+          </div>
+        ))}
       </div>
     ),
   },
   {
     num: '02',
     icon: TrendingUp,
-    title: 'Track the Trends',
-    desc: 'See how a topic grows across years with clear charts.',
+    title: 'Track Research Trends',
+    desc: 'Follow keywords and topics to visualize publication trends over time with interactive charts.',
     preview: (
-      <div className="mt-4 space-y-2 rounded-lg border border-border bg-base/60 p-3">
-        <div className="rounded-md bg-elevated px-2 py-1.5 text-[10px] text-muted">Keyword: "deep learning"</div>
-        {[
-          { year: '2022', count: '8.2k' },
-          { year: '2023', count: '11.4k' },
-          { year: '2024', count: '14.1k' },
-        ].map((r) => (
-          <div key={r.year} className="flex items-center justify-between text-[10px]">
-            <span className="text-primary">{r.year}</span>
-            <span className="font-mono text-accent-green">{r.count} papers</span>
+      <div className="mt-4 rounded-lg border border-border bg-base/60 p-3">
+        <p className="mb-2 text-[10px] font-semibold text-primary">Papers per Year: &quot;Deep Learning&quot;</p>
+        {[2021, 2022, 2023, 2024].map((year, i) => (
+          <div key={year} className="flex items-center gap-2 text-[10px]">
+            <span className="w-6 text-muted">{year}</span>
+            <div className="flex-1 rounded bg-accent-primary/20" style={{ width: `${[30, 55, 75, 100][i]}%` }}>
+              <span className="px-1 text-accent-glow">{[120, 220, 300, 400][i]}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -45,18 +47,21 @@ const steps = [
   {
     num: '03',
     icon: Bell,
-    title: 'Follow & Get Notified',
-    desc: 'Bookmark topics and get alerts when new papers are published.',
+    title: 'Get Notified',
+    desc: 'Follow journals and topics to receive alerts when new relevant papers are published.',
     preview: (
-      <div className="mt-4 grid grid-cols-3 gap-1.5">
-        {['Keyword', 'Journal', 'Alerts'].map((col, i) => (
-          <div key={col} className="rounded-lg border border-border bg-base/60 p-2">
-            <p className="text-[9px] font-semibold text-muted">{col}</p>
-            {i === 2 && (
-              <div className="mt-1 rounded bg-accent-green/15 px-1 py-0.5 text-[9px] text-accent-green">
-                3 new
-              </div>
-            )}
+      <div className="mt-4 space-y-2">
+        {[
+          { icon: '📄', title: 'New paper in Machine Learning', time: '2 min ago' },
+          { icon: '📄', title: 'Deep Learning paper trending', time: '15 min ago' },
+          { icon: '📄', title: 'AI paper in Nature', time: '1 hour ago' },
+        ].map((n) => (
+          <div key={n.title} className="flex items-center gap-2 rounded-lg border border-border bg-base/60 px-3 py-2 text-[10px]">
+            <span>{n.icon}</span>
+            <div className="flex-1">
+              <p className="font-medium text-primary">{n.title}</p>
+              <p className="text-muted">{n.time}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -71,8 +76,9 @@ export default function HowItWorks() {
         <ScrollReveal>
           <p className="text-center text-sm font-medium text-accent-glow">How It Works</p>
           <h2 className="mt-2 text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Three Steps to Insight
+            From Discovery to Insight
           </h2>
+          <p className="mt-2 text-center text-sm text-muted">Three steps to stay ahead in your research field</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">

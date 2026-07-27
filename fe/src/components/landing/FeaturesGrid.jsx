@@ -1,23 +1,24 @@
-import { Search, BarChart2, Database, TrendingUp, Bookmark, LayoutDashboard } from 'lucide-react'
+import { BarChart2, Globe, BookOpen, Shield, TrendingUp, Target } from 'lucide-react'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const features = [
-  { icon: Search, title: 'Powerful Search', desc: 'Find papers by keyword, author, or journal across millions of records.' },
-  { icon: TrendingUp, title: 'Publication Trends', desc: 'See how research topics rise and fall in volume year over year.' },
-  { icon: Database, title: 'Open Data Sources', desc: 'Metadata synced from OpenAlex, Crossref, and Semantic Scholar.' },
-  { icon: BarChart2, title: 'Emerging Topics', desc: 'Spot fast-growing research areas before they become mainstream.' },
-  { icon: Bookmark, title: 'Save & Follow', desc: 'Bookmark papers and follow the journals or keywords you care about.' },
-  { icon: LayoutDashboard, title: 'Smart Dashboards', desc: 'Charts and statistics that turn raw metadata into real insight.' },
+  { icon: TrendingUp, title: 'Publication Trends', desc: 'Visualize research output over time with interactive charts and keyword-based trend analysis.' },
+  { icon: BookOpen, title: 'Paper Discovery', desc: 'Search and filter thousands of scientific papers by keyword, author, journal, and publication year.' },
+  { icon: Globe, title: 'OpenAlex Sync', desc: 'Import publication metadata from the OpenAlex academic API on a schedule or on demand.' },
+  { icon: Target, title: 'Topic Tracking', desc: 'Follow research topics and receive alerts when new papers matching your interests are published.' },
+  { icon: Shield, title: 'Curated Datasets', desc: 'High-quality metadata including titles, abstracts, keywords, authors, and journal information.' },
+  { icon: BarChart2, title: 'Deep Analytics', desc: 'Insights on journal impact, keyword frequency, and emerging research areas over time.' },
 ]
 
 export default function FeaturesGrid() {
   return (
-    <section id="features" className="px-4 py-20 sm:px-6 lg:px-8">
+    <section className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Everything You Need to Track Research
+            Built for Research Analysis
           </h2>
+          <p className="mt-2 text-center text-sm text-muted">From keyword trends to journal impact — all in one platform</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

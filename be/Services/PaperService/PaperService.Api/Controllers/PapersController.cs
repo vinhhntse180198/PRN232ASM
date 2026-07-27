@@ -23,6 +23,7 @@ public class PapersController : ControllerBase
         [FromQuery] string? keyword = null,
         [FromQuery] string? author = null,
         [FromQuery] string? journal = null,
+        [FromQuery] Guid? topicId = null,
         CancellationToken cancellationToken = default)
     {
         var result = await _paperService.SearchAsync(new SearchPaperRequest
@@ -31,7 +32,8 @@ public class PapersController : ControllerBase
             PageSize = pageSize,
             Keyword = keyword,
             Author = author,
-            Journal = journal
+            Journal = journal,
+            TopicId = topicId
         }, cancellationToken);
 
         return Ok(ApiResponse<object>.Ok(result));
@@ -42,39 +44,6 @@ public class PapersController : ControllerBase
     {
         var paper = await _paperService.GetByIdAsync(id, cancellationToken);
         return Ok(ApiResponse<object>.Ok(paper));
-    }
-
-    /// <summary>
-    /// REST entry point that calls RecommendationService over gRPC.
-    /// </summary>
-    [HttpGet("{id:guid}/recommendations")]
-    public async Task<ActionResult<ApiResponse<object>>> GetRecommendations(
-        Guid id,
-        [FromQuery] int limit = 5,
-        CancellationToken cancellationToken = default)
-    {
-        var items = await _paperService.GetRecommendationsAsync(id, limit, cancellationToken);
-        return Ok(ApiResponse<object>.Ok(items));
-    }
-
-    /// <summary>
-    /// REST → PricingService gRPC (impact / "pricing" score from Paper DB fields).
-    /// </summary>
-    [HttpGet("{id:guid}/impact-score")]
-    public async Task<ActionResult<ApiResponse<object>>> GetImpactScore(Guid id, CancellationToken cancellationToken = default)
-    {
-        var result = await _paperService.GetImpactScoreAsync(id, cancellationToken);
-        return Ok(ApiResponse<object>.Ok(result));
-    }
-
-    /// <summary>
-    /// REST → InferenceService gRPC (AI/ML-style insights from title/abstract in Paper DB).
-    /// </summary>
-    [HttpGet("{id:guid}/insights")]
-    public async Task<ActionResult<ApiResponse<object>>> GetInsights(Guid id, CancellationToken cancellationToken = default)
-    {
-        var result = await _paperService.GetInsightsAsync(id, cancellationToken);
-        return Ok(ApiResponse<object>.Ok(result));
     }
 
     [HttpPost]
@@ -88,13 +57,10 @@ public class PapersController : ControllerBase
 
     [HttpPost("import")]
     public async Task<ActionResult<ApiResponse<object>>> Import(
-        [FromBody] ImportPaperRequest request,
+        [FromBody] CreatePaperRequest request,
         CancellationToken cancellationToken = default)
     {
-        var created = await _paperService.ImportAsync(request, cancellationToken);
-        if (!created)
-            return Conflict(ApiResponse.Fail("Paper already exists."));
-
-        return Ok(ApiResponse<object>.Ok(new { imported = true }));
+        var paper = await _paperService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = paper.Id }, ApiResponse<object>.Ok(paper));
     }
 }

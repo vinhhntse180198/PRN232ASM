@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import SimpleLineChart from '../../components/ui/SimpleLineChart'
 import SimpleBarChart from '../../components/ui/SimpleBarChart'
 import { getAnalytics, getDashboard } from '../../services/trendService'
 
@@ -65,11 +66,11 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <ChartCard title="Papers by Year">
-          <SimpleBarChart data={papersByYear} color="#818CF8" />
+        <ChartCard title="Publications Over Time">
+          <SimpleLineChart data={papersByYear} labelKey="year" valueKey="count" color="#818CF8" />
         </ChartCard>
         <ChartCard title="Top Keywords">
-          <SimpleBarChart data={topKeywords} color="#10B981" />
+          <SimpleBarChart data={topKeywords} labelKey="keyword" valueKey="count" color="#10B981" />
         </ChartCard>
       </div>
     </div>

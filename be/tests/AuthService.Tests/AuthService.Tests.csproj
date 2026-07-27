@@ -10,4 +10,7 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\AuthService\AuthService.Domain\AuthService.Domain.csproj" />
+  </ItemGroup>
 </Project>

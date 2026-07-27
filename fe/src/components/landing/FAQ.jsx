@@ -4,24 +4,24 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const faqs = [
   {
-    q: 'Where does the data come from?',
-    a: 'We use public metadata from free academic sources such as OpenAlex, Crossref, and Semantic Scholar — including titles, abstracts, keywords, publication year, authors, and journals.',
+    q: 'What data sources does SciTrend use?',
+    a: 'SciTrend aggregates publication metadata from the OpenAlex academic API (titles, abstracts, keywords, years, authors, journals). Full-text content is not stored.',
   },
   {
-    q: 'Is Paper Trend Tracker free to use?',
-    a: 'Yes. The platform is built on free, open academic APIs, so you can search papers and explore publication trends at no cost.',
+    q: 'How does keyword trend tracking work?',
+    a: 'You can follow specific keywords or research topics. The system monitors new publications and sends notifications when papers matching your interests are published. Trends are recalculated every 6 hours from the latest data.',
   },
   {
-    q: 'How are publication trends calculated?',
-    a: 'We aggregate the number of papers published per keyword and per topic across years, then visualize the change over time so you can see what is rising or fading.',
+    q: 'What research domains are covered?',
+    a: 'SciTrend currently focuses on curated datasets from Computer Science and AI research. The admin can configure additional data sources and research domains through the system settings.',
   },
   {
-    q: 'Which research fields are covered?',
-    a: 'To keep results focused and fast, the system initially tracks selected domains such as Computer Science and Artificial Intelligence, with more fields added over time.',
+    q: 'Can I export or generate reports?',
+    a: 'Yes. Both regular users and administrators can generate trend reports showing publication counts, top keywords, and growth analysis for any time period in the dataset.',
   },
   {
-    q: 'How often is the data updated?',
-    a: 'Data is synchronized on a periodic schedule (for example daily or weekly). It is not real-time, which keeps the dataset stable and consistent for analysis.',
+    q: 'How often is the paper database updated?',
+    a: 'Data synchronization runs daily via the OpenAlex API when enabled by the administrator. Manual sync can also be triggered from the admin panel at any time.',
   },
 ]
 
@@ -52,7 +52,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
-    <section id="faq" className="px-4 py-20 sm:px-6 lg:px-8">
+    <section className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">

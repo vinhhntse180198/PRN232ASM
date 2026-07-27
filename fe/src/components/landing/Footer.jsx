@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 
 const footerLinks = {
-  Product: ['Features', 'Trends', 'Topics', 'Dashboard'],
-  Explore: ['Papers', 'Journals', 'Keywords', 'Data Sources'],
-  Company: ['About', 'Team', 'Contact', 'Privacy'],
+  Product: ['Features', 'Research Topics', 'Dashboard', 'Reports'],
+  Resources: ['Paper Search', 'Trend Analytics', 'API Sources', 'Help Center'],
+  Company: ['About', 'Research', 'Privacy Policy', 'Contact'],
 }
 
 export default function Footer() {
@@ -12,11 +12,11 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold text-primary">
-            Paper Trend Tracker
+            SciTrend
             <span className="h-2 w-2 rounded-full bg-accent-primary" />
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            Track scientific publication trends and discover emerging research topics from open academic data.
+            Track and analyze scientific publication trends. Built for researchers, lecturers, and students.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ export default function Footer() {
 
       <div className="mx-auto mt-12 max-w-7xl border-t border-border pt-8">
         <p className="text-center text-xs text-muted">
-          © {new Date().getFullYear()} Paper Trend Tracker. All rights reserved.
+          © {new Date().getFullYear()} SciTrend. Scientific Publication Trend Tracking.
         </p>
       </div>
     </footer>

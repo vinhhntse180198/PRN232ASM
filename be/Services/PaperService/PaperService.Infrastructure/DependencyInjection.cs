@@ -15,10 +15,10 @@ public static class DependencyInjection
     public static IServiceCollection AddPaperInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? "Data Source=paper.db";
+            ?? "Server=localhost,1433;Database=PaperDb;User Id=sa;Password=Prn232_Sql_Strong!2026;TrustServerCertificate=True;Encrypt=False;";
 
         services.AddDbContext<PaperServiceDbContext>(options =>
-            options.UseSqlite(connectionString));
+            options.UseSqlServer(connectionString));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPaperService, Application.Services.PaperService>();
@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddSingleton<IUserProfileClient, UserProfileGrpcClient>();
 
         services.AddRabbitMqEventBus(configuration);
+        services.AddTransactionalOutbox<PaperServiceDbContext>();
 
         return services;
     }

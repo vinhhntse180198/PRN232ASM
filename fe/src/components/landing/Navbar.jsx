@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useNavbarScroll } from '../../hooks/useNavbarScroll'
 
-const links = ['Features', 'How It Works', 'Testimonials', 'FAQ']
+const links = ['Features', 'How It Works', 'Research Topics', 'Dashboard']
 
 export default function Navbar() {
   const scrolled = useNavbarScroll()
@@ -14,7 +14,7 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-primary">
-          Paper Trend Tracker
+          SciTrend
           <span className="h-2 w-2 rounded-full bg-accent-primary shadow-glow-sm" />
         </Link>
 
@@ -22,7 +22,7 @@ export default function Navbar() {
           {links.map((item) => (
             <li key={item}>
               <a
-                href={`#${item.toLowerCase().replace(/ /g, '-')}`}
+                href={`#${item.toLowerCase().replace(' ', '-')}`}
                 className="text-sm text-muted transition-colors hover:text-primary"
               >
                 {item}
@@ -32,12 +32,6 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/papers"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-primary transition-colors hover:text-accent-glow"
-          >
-            Papers
-          </Link>
           <Link
             to="/login"
             className="rounded-lg px-4 py-2 text-sm font-medium text-primary transition-colors hover:text-accent-glow"

@@ -15,11 +15,22 @@ public class NotificationsController : ControllerBase
         _notificationService = notificationService;
     }
 
+    private Guid GetUserId()
+    {
+        if (Request.Headers.TryGetValue("X-User-Id", out var headerValue) &&
+            Guid.TryParse(headerValue.FirstOrDefault(), out var userId) &&
+            userId != Guid.Empty)
+        {
+            return userId;
+        }
+        throw new UnauthorizedAccessException("X-User-Id header is required.");
+    }
+
     [HttpGet]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<Application.DTOs.NotificationDto>>>> GetByUser(
-        [FromQuery] Guid userId,
         CancellationToken cancellationToken)
     {
+        var userId = GetUserId();
         var data = await _notificationService.GetByUserIdAsync(userId, cancellationToken);
         return Ok(ApiResponse<IReadOnlyList<Application.DTOs.NotificationDto>>.Ok(data));
     }
@@ -27,15 +38,15 @@ public class NotificationsController : ControllerBase
     [HttpPut("{id:guid}/read")]
     public async Task<ActionResult<ApiResponse<object>>> MarkAsRead(Guid id, CancellationToken cancellationToken)
     {
-        await _notificationService.MarkAsReadAsync(id, cancellationToken);
+        var userId = GetUserId();
+        await _notificationService.MarkAsReadAsync(id, userId, cancellationToken);
         return Ok(ApiResponse<object>.Ok(new { }, "Notification marked as read."));
     }
 
     [HttpPut("read-all")]
-    public async Task<ActionResult<ApiResponse<object>>> MarkAllAsRead(
-        [FromQuery] Guid userId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<object>>> MarkAllAsRead(CancellationToken cancellationToken)
     {
+        var userId = GetUserId();
         await _notificationService.MarkAllAsReadAsync(userId, cancellationToken);
         return Ok(ApiResponse<object>.Ok(new { }, "All notifications marked as read."));
     }

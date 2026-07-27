@@ -1,4 +1,27 @@
+name: prn232asm
+
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: prn232asm-sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026}"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\" || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: prn232asm-rabbitmq
@@ -23,7 +46,8 @@ services:
       - "5000:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
+      ASPNETCORE_URLS: http://+:8080
+      JWT__Secret: ${JWT_SECRET:-PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars}
       JWT__Issuer: PRN232ASM
       JWT__Audience: PRN232ASM-Users
       ReverseProxy__Clusters__auth-cluster__Destinations__auth__Address: http://auth-service:8080
@@ -47,15 +71,13 @@ services:
       - "5131:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      JWT__Secret: PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AuthDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
+      JWT__Secret: ${JWT_SECRET:-PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars}
       JWT__Issuer: PRN232ASM
       JWT__Audience: PRN232ASM-Users
-      RabbitMQ__Host: rabbitmq
-      RabbitMQ__Port: 5672
-      RabbitMQ__Username: guest
-      RabbitMQ__Password: guest
     depends_on:
-      rabbitmq:
+      sqlserver:
         condition: service_healthy
 
   paper-service:
@@ -68,88 +90,16 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=PaperDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
-      RecommendationService__Address: http://recommendation-service:8080
-      PricingService__Address: http://pricing-service:8080
-      InferenceService__Address: http://inference-service:8080
-      InventoryService__Address: http://inventory-service:8080
-      UserProfileService__Address: http://user-profile-service:8080
     depends_on:
+      sqlserver:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      recommendation-service:
-        condition: service_started
-      pricing-service:
-        condition: service_started
-      inference-service:
-        condition: service_started
-      inventory-service:
-        condition: service_started
-      user-profile-service:
-        condition: service_started
-
-  recommendation-service:
-    build:
-      context: ../be
-      dockerfile: Services/RecommendationService/Dockerfile
-    container_name: prn232asm-recommendation-service
-    ports:
-      - "5006:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
-
-  pricing-service:
-    build:
-      context: ../be
-      dockerfile: Services/PricingService/Dockerfile
-    container_name: prn232asm-pricing-service
-    ports:
-      - "5007:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
-
-  inference-service:
-    build:
-      context: ../be
-      dockerfile: Services/InferenceService/Dockerfile
-    container_name: prn232asm-inference-service
-    ports:
-      - "5008:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
-
-  inventory-service:
-    build:
-      context: ../be
-      dockerfile: Services/InventoryService/Dockerfile
-    container_name: prn232asm-inventory-service
-    ports:
-      - "5009:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
-
-  user-profile-service:
-    build:
-      context: ../be
-      dockerfile: Services/UserProfileService/Dockerfile
-    container_name: prn232asm-user-profile-service
-    ports:
-      - "5010:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_Kestrel__EndpointDefaults__Protocols: Http2
 
   trend-service:
     build:
@@ -160,12 +110,20 @@ services:
       - "5003:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=TrendDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
+      ConnectionStrings__HangfireConnection: "Server=sqlserver,1433;Database=TrendDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
+      RabbitMQ__QueuePrefix: trend
+      PaperService__GrpcUrl: http://paper-service:8080
       PaperService__BaseUrl: http://paper-service:8080
+      JWT__Secret: ${JWT_SECRET:-PRN232ASM_JWT_Secret_Key_2026_Change_In_Production_32chars}
     depends_on:
+      sqlserver:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       paper-service:
@@ -180,14 +138,16 @@ services:
       - "5004:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Data Source=/data/notify.db
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=NotificationDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
-    volumes:
-      - notification-data:/data
+      RabbitMQ__QueuePrefix: notification
     depends_on:
+      sqlserver:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
@@ -200,17 +160,23 @@ services:
       - "5005:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Data Source=/data/sync.db
-      OpenAlex__Enabled: "false"
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=SyncDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
+      ConnectionStrings__HangfireConnection: "Server=sqlserver,1433;Database=SyncDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Prn232_Sql_Strong!2026};TrustServerCertificate=True;Encrypt=False;"
+      OpenAlex__Enabled: "true"
+      OpenAlex__BaseUrl: "https://api.openalex.org"
+      OpenAlex__DefaultYear: "2024"
+      OpenAlex__DefaultYears: "2024"
+      OpenAlex__MaxImportCount: "200"
       OpenAlex__ApiKey: ""
       PaperService__BaseUrl: http://paper-service:8080
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Port: 5672
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
-    volumes:
-      - sync-data:/data
     depends_on:
+      sqlserver:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       paper-service:
@@ -230,5 +196,4 @@ services:
       - api-gateway
 
 volumes:
-  notification-data:
-  sync-data:
+  sqlserver-data:

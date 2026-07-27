@@ -24,11 +24,11 @@ public class FollowRepository : IFollowRepository
             _db.FollowTopics.Remove(entity);
     }
 
-    public Task<FollowKeyword?> GetKeywordFollowAsync(Guid userId, Guid keywordId, CancellationToken cancellationToken = default)
-        => _db.FollowKeywords.FirstOrDefaultAsync(x => x.UserId == userId && x.KeywordId == keywordId, cancellationToken);
-
     public async Task AddKeywordFollowAsync(FollowKeyword follow, CancellationToken cancellationToken = default)
         => await _db.FollowKeywords.AddAsync(follow, cancellationToken);
+
+    public async Task<FollowKeyword?> GetKeywordFollowAsync(Guid userId, Guid keywordId, CancellationToken cancellationToken = default)
+        => await _db.FollowKeywords.FirstOrDefaultAsync(x => x.UserId == userId && x.KeywordId == keywordId, cancellationToken);
 
     public async Task RemoveKeywordFollowAsync(Guid userId, Guid keywordId, CancellationToken cancellationToken = default)
     {
@@ -37,8 +37,8 @@ public class FollowRepository : IFollowRepository
             _db.FollowKeywords.Remove(entity);
     }
 
-    public Task<FollowJournal?> GetJournalFollowAsync(Guid userId, Guid journalId, CancellationToken cancellationToken = default)
-        => _db.FollowJournals.FirstOrDefaultAsync(x => x.UserId == userId && x.JournalId == journalId, cancellationToken);
+    public async Task<FollowJournal?> GetJournalFollowAsync(Guid userId, Guid journalId, CancellationToken cancellationToken = default)
+        => await _db.FollowJournals.FirstOrDefaultAsync(x => x.UserId == userId && x.JournalId == journalId, cancellationToken);
 
     public async Task AddJournalFollowAsync(FollowJournal follow, CancellationToken cancellationToken = default)
         => await _db.FollowJournals.AddAsync(follow, cancellationToken);

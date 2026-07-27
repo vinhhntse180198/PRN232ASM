@@ -11,20 +11,20 @@ export default function CTASection() {
             Ready to Explore Research Trends?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm text-muted sm:text-base">
-            Start tracking scientific publication trends today — free for students, lecturers, and researchers.
+            Join researchers and students tracking the latest scientific publication trends.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               to="/register"
               className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-base transition-opacity hover:opacity-90 sm:w-auto"
             >
-              Get Started Free
+              Start for Free
             </Link>
             <Link
-              to="/login"
+              to="/dashboard"
               className="inline-flex w-full items-center justify-center rounded-xl border border-primary/30 px-8 py-3.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 sm:w-auto"
             >
-              Explore Dashboard
+              View Live Dashboard
             </Link>
           </div>
         </ScrollReveal>

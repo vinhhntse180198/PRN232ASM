@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Bell, Loader2 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import {
@@ -7,16 +7,19 @@ import {
   markNotificationRead,
 } from '../../services/notificationService'
 
+const POLL_INTERVAL = 15000 // 15 seconds
+
 export default function NotificationsPage() {
   const { user } = useAuth()
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const intervalRef = useRef(null)
 
   const load = async () => {
     if (!user?.id) return
     try {
-      const data = await getNotifications(user.id)
+      const data = await getNotifications()
       setNotifications(data || [])
     } catch (err) {
       setError(err.message)
@@ -27,6 +30,8 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     load()
+    intervalRef.current = setInterval(load, POLL_INTERVAL)
+    return () => clearInterval(intervalRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
@@ -36,7 +41,7 @@ export default function NotificationsPage() {
   }
 
   const markAllRead = async () => {
-    await markAllNotificationsRead(user.id)
+    await markAllNotificationsRead()
     await load()
   }
 

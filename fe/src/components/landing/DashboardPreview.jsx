@@ -1,43 +1,43 @@
 import {
   BarChart3,
-  FileText,
-  LayoutDashboard,
-  Sparkles,
-  Tags,
+  BookOpen,
   TrendingUp,
+  Sparkles,
+  Users,
+  FileText,
 } from 'lucide-react'
 import { useCountUp } from '../../hooks/useCountUp'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', active: true },
+  { icon: BarChart3, label: 'Dashboard', active: true },
   { icon: FileText, label: 'Papers' },
   { icon: TrendingUp, label: 'Trends' },
-  { icon: Tags, label: 'Topics' },
-  { icon: BarChart3, label: 'Reports' },
+  { icon: Users, label: 'Topics' },
 ]
 
 const stats = [
-  { label: 'Total Papers', value: 12480, change: '+12.5%', positive: true },
-  { label: 'Keywords Tracked', value: 1240, change: '+8.1%', positive: true },
-  { label: 'Emerging Topics', value: 36, change: '+6', positive: true },
-  { label: 'YoY Growth', value: 18, suffix: '%', change: '+4.2%', positive: true },
+  { label: 'Total Papers', value: 12847, suffix: '', change: '+12.5%', positive: true },
+  { label: 'Keywords Tracked', value: 342, suffix: '', change: '+8.1%', positive: true },
+  { label: 'Research Topics', value: 56, suffix: '', change: '+3', positive: true },
+  { label: 'Journals Covered', value: 189, suffix: '', change: '+12', positive: true },
 ]
 
-const papers = [
-  { name: 'Attention Is All You Need', value: '2017', status: 'NeurIPS', trend: 'Hot' },
-  { name: 'Deep Residual Learning', value: '2016', status: 'CVPR', trend: 'Rising' },
-  { name: 'Language Models are Few-Shot Learners', value: '2020', status: 'NeurIPS', trend: 'Hot' },
+const topKeywords = [
+  { name: 'machine learning', papers: 847 },
+  { name: 'deep learning', papers: 634 },
+  { name: 'neural networks', papers: 521 },
+  { name: 'natural language', papers: 398 },
 ]
 
-function StatCard({ stat }) {
+function StatCard({ stat, index }) {
   const { ref, formatted } = useCountUp(stat.value, 1400)
 
   return (
     <div className="rounded-xl border border-border bg-base/60 p-4">
       <p className="text-xs text-muted">{stat.label}</p>
       <p ref={ref} className="mt-1 font-mono text-xl font-semibold text-primary">
-        {stat.suffix === '%' ? `${formatted}%` : Number(formatted).toLocaleString()}
+        {Number(formatted).toLocaleString()}
       </p>
       <p className={`mt-1 text-xs font-medium ${stat.positive ? 'text-accent-green' : 'text-red-400'}`}>
         {stat.change}
@@ -58,7 +58,7 @@ export default function DashboardPreview() {
               {/* Sidebar */}
               <aside className="hidden w-52 shrink-0 border-r border-border bg-base/80 p-4 md:block">
                 <div className="mb-6 flex items-center gap-2 font-display text-sm font-bold text-primary">
-                  Paper Trend Tracker
+                  SciTrend
                   <span className="h-1.5 w-1.5 rounded-full bg-accent-primary" />
                 </div>
                 <nav className="space-y-1">
@@ -83,47 +83,34 @@ export default function DashboardPreview() {
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
                   <div>
                     <p className="text-xs text-muted">Dashboard</p>
-                    <h3 className="font-display text-lg font-bold text-primary">Welcome back, Researcher</h3>
+                    <h3 className="font-display text-lg font-bold text-primary">Research Overview</h3>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      className="rounded-lg bg-accent-primary px-3 py-1.5 text-xs font-semibold text-white"
-                    >
-                      New Report
-                    </button>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-elevated text-xs font-bold text-accent-glow">
-                      R
+                      DR
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                  {stats.map((stat) => (
-                    <StatCard key={stat.label} stat={stat} />
+                  {stats.map((stat, i) => (
+                    <StatCard key={stat.label} stat={stat} index={i} />
                   ))}
                 </div>
 
                 <div className="mt-4 rounded-xl border border-border bg-base/40 p-4">
-                  <p className="mb-3 text-sm font-semibold text-primary">Trending Papers</p>
+                  <p className="mb-3 text-sm font-semibold text-primary">Top Keywords This Month</p>
                   <div className="space-y-2">
-                    {papers.map((row) => (
+                    {topKeywords.map((row) => (
                       <div
                         key={row.name}
                         className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface/80 px-3 py-2 text-xs"
                       >
                         <span className="font-medium text-primary">{row.name}</span>
-                        <span className="font-mono text-muted">{row.value}</span>
-                        <span className="rounded-full bg-elevated px-2 py-0.5 text-muted">{row.status}</span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 ${
-                            row.trend === 'Hot'
-                              ? 'bg-accent-amber/15 text-accent-amber'
-                              : 'bg-accent-green/15 text-accent-green'
-                          }`}
-                        >
-                          {row.trend}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-muted">{row.papers.toLocaleString()} papers</span>
+                          <span className="rounded-full bg-accent-primary/10 px-2 py-0.5 text-muted">+5%</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -135,27 +122,22 @@ export default function DashboardPreview() {
           {/* Floating cards */}
           <div className="absolute -bottom-6 -right-2 z-10 hidden rounded-xl border border-border bg-surface p-3 shadow-card sm:block lg:-right-8">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-accent-primary" />
+              <TrendingUp className="h-4 w-4 text-accent-primary" />
               <div>
-                <p className="text-xs font-semibold text-primary">Emerging Topic</p>
-                <p className="text-[10px] text-muted">Graph Neural Networks</p>
+                <p className="text-xs font-semibold text-primary">Trending Up</p>
+                <p className="text-[10px] text-muted">+23% AI papers this week</p>
               </div>
-            </div>
-            <div className="mt-2 flex -space-x-2">
-              {['AI', 'ML', 'DL'].map((l) => (
-                <div
-                  key={l}
-                  className="flex h-6 w-6 items-center justify-center rounded-full border border-base bg-elevated text-[9px] font-bold text-accent-glow"
-                >
-                  {l}
-                </div>
-              ))}
             </div>
           </div>
 
           <div className="absolute -left-2 top-1/3 z-10 hidden rounded-xl border border-accent-green/30 bg-surface p-3 shadow-card sm:block lg:-left-10">
-            <p className="text-xs font-semibold text-accent-green">Trend detected</p>
-            <p className="mt-1 text-[10px] text-muted">📈 +42% YoY on “LLM”</p>
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-accent-green" />
+              <div>
+                <p className="text-xs font-semibold text-accent-green">New Papers</p>
+                <p className="text-[10px] text-muted">127 papers synced today</p>
+              </div>
+            </div>
           </div>
         </div>
       </ScrollReveal>

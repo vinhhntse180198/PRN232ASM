@@ -2,34 +2,34 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const testimonials = [
   {
-    quote: 'I found the emerging topics for my thesis in minutes instead of weeks of manual review.',
-    name: 'Dr. Anh Tran',
-    role: 'Lecturer, Computer Science',
-    initials: 'AT',
+    quote: 'SciTrend helped us identify emerging AI research topics months before they became mainstream. The trend analysis alone saved countless hours of manual literature review.',
+    name: 'Dr. Sarah Chen',
+    role: 'Associate Professor, Stanford CS',
+    initials: 'SC',
   },
   {
-    quote: 'The trend charts made the literature review section of my paper so much stronger.',
-    name: 'Minh Le',
-    role: 'PhD Student, Data Science',
-    initials: 'ML',
+    quote: 'As a PhD student, keeping up with publication trends in machine learning was overwhelming. This platform makes it manageable and insightful.',
+    name: 'Marcus Webb',
+    role: 'PhD Candidate, MIT',
+    initials: 'MW',
   },
   {
-    quote: 'We track which subfields are heating up to help plan our lab’s research direction.',
-    name: 'Prof. Elena Rossi',
-    role: 'Research Lead, AI Lab',
+    quote: 'The keyword tracking feature is a game-changer. We finally have visibility into which research areas are gaining momentum.',
+    name: 'Dr. Elena Rossi',
+    role: 'Research Director, Forma Labs',
     initials: 'ER',
   },
 ]
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="px-4 py-20 sm:px-6 lg:px-8">
+    <section className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Trusted by Researchers &amp; Students
+            Trusted by Researchers Worldwide
           </h2>
-          <p className="mt-2 text-center text-sm text-muted">Used by labs, lecturers, and universities</p>
+          <p className="mt-2 text-center text-sm text-muted">Used by academics at leading universities and research institutions</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">

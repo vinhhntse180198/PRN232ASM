@@ -32,13 +32,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = useCallback(async () => {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken')
-      if (refreshToken) await logoutUser(refreshToken)
-    } catch {
-      // ignore logout API errors
-    }
-    clearAuthSession()
+    await logoutUser()
     setUser(null)
   }, [])
 

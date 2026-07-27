@@ -9,6 +9,8 @@ public class PaperSummaryResponse
     public int PublicationYear { get; set; }
     public int CitationCount { get; set; }
     public string JournalName { get; set; } = string.Empty;
+    public string? Url { get; set; }
+    public string? PdfUrl { get; set; }
     public IReadOnlyList<string> Authors { get; set; } = Array.Empty<string>();
     public IReadOnlyList<string> Keywords { get; set; } = Array.Empty<string>();
 }

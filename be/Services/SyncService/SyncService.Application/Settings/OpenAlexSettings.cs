@@ -10,4 +10,10 @@ public class OpenAlexSettings
     public short DefaultYear { get; set; } = 2023;
     public string DefaultYears { get; set; } = "2022,2023,2024";
     public int DefaultPerPage { get; set; } = 100;
+
+    /// <summary>
+    /// Optional override applied to DataSource.MaxImportCount when seeding/syncing config.
+    /// Bound from OpenAlex__MaxImportCount in docker-compose.
+    /// </summary>
+    public int? MaxImportCount { get; set; }
 }

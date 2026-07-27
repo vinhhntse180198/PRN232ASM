@@ -1,7 +1,7 @@
 import { apiFetch, unwrap } from '../lib/api'
 
-export async function getNotifications(userId) {
-  const res = await apiFetch(`/api/notifications?userId=${userId}`)
+export async function getNotifications() {
+  const res = await apiFetch('/api/notifications')
   return unwrap(res)
 }
 
@@ -9,44 +9,44 @@ export async function markNotificationRead(id) {
   return apiFetch(`/api/notifications/${id}/read`, { method: 'PUT' })
 }
 
-export async function markAllNotificationsRead(userId) {
-  return apiFetch(`/api/notifications/read-all?userId=${userId}`, { method: 'PUT' })
+export async function markAllNotificationsRead() {
+  return apiFetch('/api/notifications/read-all', { method: 'PUT' })
 }
 
-export async function getFollows(userId) {
-  const res = await apiFetch(`/api/follows?userId=${userId}`)
+export async function getFollows() {
+  const res = await apiFetch('/api/follows')
   return unwrap(res)
 }
 
-export async function followTopic(userId, topicId) {
+export async function followTopic(topicId) {
   return apiFetch('/api/follows/topic', {
     method: 'POST',
-    body: JSON.stringify({ userId, topicId }),
+    body: JSON.stringify({ topicId }),
   })
 }
 
-export async function followKeyword(userId, keywordId) {
+export async function unfollowTopic(topicId) {
+  return apiFetch(`/api/follows/topic/${topicId}`, { method: 'DELETE' })
+}
+
+export async function followKeyword(keywordId) {
   return apiFetch('/api/follows/keyword', {
     method: 'POST',
-    body: JSON.stringify({ userId, keywordId }),
+    body: JSON.stringify({ keywordId }),
   })
 }
 
-export async function followJournal(userId, journalId) {
+export async function unfollowKeyword(keywordId) {
+  return apiFetch(`/api/follows/keyword/${keywordId}`, { method: 'DELETE' })
+}
+
+export async function followJournal(journalId) {
   return apiFetch('/api/follows/journal', {
     method: 'POST',
-    body: JSON.stringify({ userId, journalId }),
+    body: JSON.stringify({ journalId }),
   })
 }
 
-export async function unfollowTopic(userId, topicId) {
-  return apiFetch(`/api/follows/topic/${topicId}?userId=${userId}`, { method: 'DELETE' })
-}
-
-export async function unfollowKeyword(userId, keywordId) {
-  return apiFetch(`/api/follows/keyword/${keywordId}?userId=${userId}`, { method: 'DELETE' })
-}
-
-export async function unfollowJournal(userId, journalId) {
-  return apiFetch(`/api/follows/journal/${journalId}?userId=${userId}`, { method: 'DELETE' })
+export async function unfollowJournal(journalId) {
+  return apiFetch(`/api/follows/journal/${journalId}`, { method: 'DELETE' })
 }

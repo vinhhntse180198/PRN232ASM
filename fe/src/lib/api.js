@@ -1,6 +1,16 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-let refreshPromise = null
+let isRefreshing = false
+let refreshSubscribers = []
+
+function subscribeTokenRefresh(callback) {
+  refreshSubscribers.push(callback)
+}
+
+function onTokenRefreshed(newAccessToken) {
+  refreshSubscribers.forEach((cb) => cb(newAccessToken))
+  refreshSubscribers = []
+}
 
 export function getStoredUser() {
   try {
@@ -31,67 +41,77 @@ export function clearAuthSession() {
   localStorage.removeItem('user')
 }
 
-async function refreshAccessToken(refreshToken) {
-  const res = await fetch(`${API_URL}/api/auth/refresh-token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
-  })
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) {
-    throw new Error(data.message || data.title || `Refresh failed (${res.status})`)
-  }
-  return data
-}
-
-async function tryRefreshSession() {
+async function tryRefreshToken() {
   const refreshToken = getRefreshToken()
-  if (!refreshToken) return false
+  if (!refreshToken) return null
 
-  if (!refreshPromise) {
-    refreshPromise = refreshAccessToken(refreshToken)
-      .then((result) => {
-        const tokens = result.data ?? result
-        setAuthSession({
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          user: tokens.user,
-        })
-        return true
-      })
-      .catch(() => {
-        clearAuthSession()
-        return false
-      })
-      .finally(() => {
-        refreshPromise = null
-      })
+  try {
+    const res = await fetch(`${API_URL}/api/auth/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    })
+
+    if (!res.ok) {
+      clearAuthSession()
+      window.location.href = '/login'
+      return null
+    }
+
+    const data = await res.json()
+    const newAccessToken = data.data?.accessToken
+    if (!newAccessToken) return null
+
+    setAuthSession({
+      accessToken: newAccessToken,
+      refreshToken: data.data?.refreshToken || refreshToken,
+      user: getStoredUser(),
+    })
+    return newAccessToken
+  } catch {
+    clearAuthSession()
+    window.location.href = '/login'
+    return null
   }
-
-  return refreshPromise
 }
 
 export async function apiFetch(path, options = {}) {
-  const doFetch = async () => {
-    const token = getAccessToken()
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    }
-    if (token) headers.Authorization = `Bearer ${token}`
-
-    const res = await fetch(`${API_URL}${path}`, { ...options, headers })
-    const data = await res.json().catch(() => ({}))
-    return { res, data }
+  const token = getAccessToken()
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
   }
+  if (token) headers.Authorization = `Bearer ${token}`
 
-  let { res, data } = await doFetch()
+  let res = await fetch(`${API_URL}${path}`, { ...options, headers })
+  const data = await res.json().catch(() => ({}))
 
-  if (res.status === 401 && !options._retried && !path.includes('/api/auth/')) {
-    const refreshed = await tryRefreshSession()
-    if (refreshed) {
-      ;({ res, data } = await doFetch())
+  if (res.status === 401 && !options._retry) {
+    if (isRefreshing) {
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((newToken) => {
+          const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` }
+          resolve(fetch(`${API_URL}${path}`, { ...options, headers: retryHeaders }).then((r) => r.json()))
+        })
+      })
     }
+
+    isRefreshing = true
+    const newToken = await tryRefreshToken()
+    isRefreshing = false
+
+    if (newToken) {
+      onTokenRefreshed(newToken)
+      const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` }
+      res = await fetch(`${API_URL}${path}`, { ...options, headers: retryHeaders })
+      const retryData = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(retryData.message || retryData.title || `Request failed (${res.status})`)
+      }
+      return retryData
+    }
+
+    throw new Error(data.message || data.title || `Request failed (401)`)
   }
 
   if (!res.ok) {

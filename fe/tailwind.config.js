@@ -4,18 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: '#080C14',
-        surface: '#0F1623',
-        elevated: '#1A2235',
+        base: '#F8FAFC',
+        surface: '#FFFFFF',
+        elevated: '#F1F5F9',
         accent: {
-          primary: '#6366F1',
-          glow: '#818CF8',
-          green: '#10B981',
-          amber: '#F59E0B',
+          primary: '#4F46E5',
+          glow: '#6366F1',
+          green: '#059669',
+          amber: '#D97706',
         },
-        primary: '#F1F5F9',
+        primary: '#0F172A',
         muted: '#64748B',
-        border: '#1E293B',
+        border: '#E2E8F0',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -23,9 +23,9 @@ export default {
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
-        glow: '0 0 60px -12px rgba(99, 102, 241, 0.45)',
-        'glow-sm': '0 0 30px -8px rgba(99, 102, 241, 0.35)',
-        card: '0 4px 24px rgba(0, 0, 0, 0.4)',
+        glow: '0 0 60px -12px rgba(79, 70, 229, 0.30)',
+        'glow-sm': '0 0 30px -8px rgba(79, 70, 229, 0.20)',
+        card: '0 4px 24px rgba(15, 23, 42, 0.06)',
       },
       animation: {
         float: 'float 3s ease-in-out infinite',
@@ -37,9 +37,9 @@ export default {
         },
       },
       backgroundImage: {
-        'hero-gradient': 'linear-gradient(135deg, #6366F1 0%, #A78BFA 100%)',
-        'cta-gradient': 'linear-gradient(135deg, #312E81 0%, #1E1B4B 50%, #080C14 100%)',
-        'halo': 'radial-gradient(ellipse at center, rgba(99,102,241,0.15) 0%, transparent 70%)',
+        'hero-gradient': 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+        'cta-gradient': 'linear-gradient(135deg, #EEF2FF 0%, #FAF5FF 50%, #F8FAFC 100%)',
+        'halo': 'radial-gradient(ellipse at center, rgba(79,70,229,0.10) 0%, transparent 70%)',
       },
     },
   },

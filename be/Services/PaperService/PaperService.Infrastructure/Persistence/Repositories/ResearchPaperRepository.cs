@@ -46,6 +46,33 @@ public class ResearchPaperRepository : IResearchPaperRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
+    public async Task<ResearchPaper?> GetByDoiAsync(string doi, CancellationToken cancellationToken = default)
+    {
+        var normalized = NormalizeDoi(doi);
+        if (string.IsNullOrEmpty(normalized))
+            return null;
+
+        var withPrefix = "https://doi.org/" + normalized;
+        return await _context.ResearchPapers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                p => p.Doi.ToLower() == normalized || p.Doi.ToLower() == withPrefix,
+                cancellationToken);
+    }
+
+    private static string NormalizeDoi(string? doi)
+    {
+        if (string.IsNullOrWhiteSpace(doi))
+            return string.Empty;
+
+        var value = doi.Trim().ToLowerInvariant();
+        const string prefix = "https://doi.org/";
+        if (value.StartsWith(prefix, StringComparison.Ordinal))
+            value = value[prefix.Length..];
+
+        return value;
+    }
+
     public async Task<IReadOnlyList<ResearchPaper>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default)
     {
         return await _context.ResearchPapers
@@ -63,6 +90,7 @@ public class ResearchPaperRepository : IResearchPaperRepository
         string? keyword,
         string? author,
         string? journal,
+        Guid? topicId = null,
         CancellationToken cancellationToken = default)
     {
         var query = _context.ResearchPapers
@@ -91,6 +119,11 @@ public class ResearchPaperRepository : IResearchPaperRepository
         {
             var term = journal.Trim().ToLower();
             query = query.Where(p => p.Journal.Name.ToLower().Contains(term));
+        }
+
+        if (topicId.HasValue)
+        {
+            query = query.Where(p => p.PaperTopics.Any(pt => pt.TopicId == topicId.Value));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
