@@ -1,5 +1,5 @@
 using Hangfire;
-using Hangfire.MemoryStorage;
+using Hangfire.SqlServer;
 using SyncService.Api.Middleware;
 using SyncService.Application.BackgroundJobs;
 using SyncService.Infrastructure;
@@ -7,21 +7,24 @@ using SyncService.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
-if (!string.Equals(builder.Configuration["USE_SUPABASE_DB"], "true", StringComparison.OrdinalIgnoreCase))
+if (!string.Equals(builder.Configuration["OpenAlex:Enabled"], "true", StringComparison.OrdinalIgnoreCase))
 {
-    builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-    {
-        ["ConnectionStrings:DefaultConnection"] = "Data Source=sync.db",
-        ["OpenAlex:Enabled"] = "false"
-    });
+    builder.Configuration["OpenAlex:Enabled"] = "false";
 }
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddHangfire(config => config.UseSimpleAssemblyNameTypeSerializer().UseRecommendedSerializerSettings()
-    .UseMemoryStorage());
+
+var hangfireDb = builder.Configuration.GetConnectionString("HangfireConnection")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=localhost,1433;Database=SyncDb;User Id=sa;Password=Prn232_Sql_Strong!2026;TrustServerCertificate=True;Encrypt=False;";
+
+builder.Services.AddHangfire(config => config
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(hangfireDb));
 builder.Services.AddHangfireServer();
 builder.Services.AddCors(options =>
 {

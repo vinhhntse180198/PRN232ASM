@@ -35,13 +35,12 @@ public class BookmarksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<object>>> GetByUser(
-        [FromQuery] Guid userId,
-        CancellationToken cancellationToken = default)
+    public async Task<ActionResult<ApiResponse<object>>> GetByUser(CancellationToken cancellationToken = default)
     {
+        var userId = GetUserId();
         if (userId == Guid.Empty)
         {
-            return BadRequest(ApiResponse.Fail("userId is required."));
+            return BadRequest(ApiResponse.Fail("Invalid user."));
         }
 
         var bookmarks = await _paperService.GetBookmarksAsync(userId, cancellationToken);

@@ -1,22 +1,15 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import {
-  BarChart3,
-  Bell,
-  Bookmark,
-  FileText,
-  LayoutDashboard,
-  LogOut,
-  Search,
-  Settings,
-  Tags,
-} from 'lucide-react'
+import { Tag, BarChart3, Bell, Bookmark, FileText, LayoutDashboard, LogOut, Search, Settings, Tags, TrendingUp, User, Users } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/papers', icon: Search, label: 'Search Papers' },
+  { to: '/search', icon: Search, label: 'Search Papers' },
+  { to: '/authors', icon: Users, label: 'Authors' },
+  { to: '/keywords', icon: Tag, label: 'Keywords' },
+  { to: '/trends', icon: TrendingUp, label: 'Research Trends' },
+  { to: '/topics', icon: Tags, label: 'Topics' },
   { to: '/bookmarks', icon: Bookmark, label: 'Bookmarks' },
-  { to: '/topics', icon: Tags, label: 'Follow Topics' },
   { to: '/notifications', icon: Bell, label: 'Notifications' },
   { to: '/reports', icon: FileText, label: 'Reports' },
 ]
@@ -73,6 +66,20 @@ export default function AppLayout() {
               Admin Panel
             </NavLink>
           )}
+
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                isActive
+                  ? 'bg-accent-primary/15 text-accent-glow'
+                  : 'text-muted hover:bg-elevated hover:text-primary'
+              }`
+            }
+          >
+            <User className="h-4 w-4" />
+            Profile
+          </NavLink>
         </nav>
 
         <div className="border-t border-border p-4">

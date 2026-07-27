@@ -57,15 +57,16 @@ Mở http://localhost:5173
 
 ## Lưu ý OpenAlex
 
-- **Local dev: chỉ dùng 303 bài seed** trong PaperService
-- `OpenAlex__Enabled=false` — không bật khi dev local
-- Bật nhầm OpenAlex sync → DB phình → **có thể mất phí Supabase**
+- **Local dev:** `OpenAlex:Enabled=false` trong `appsettings.json` (và README khuyến nghị giữ tắt) — dùng ~303 bài seed trong PaperService; tránh sync làm phình DB / phí Supabase.
+- **Docker Compose:** set `OpenAlex__Enabled=true` → SyncService seed/đồng bộ `DataSource.IsEnabled=true` theo config.
+- Bật local: set env `OpenAlex__Enabled=true` (hoặc sửa appsettings) rồi restart SyncService.
+- Tắt Docker: đổi `OpenAlex__Enabled: "false"` trong `docker/docker-compose.yml`.
 
 ## Yêu cầu môn học
 
 - 5 Microservices + YARP Gateway
 - JWT Authentication
-- RabbitMQ (5 events)
+- RabbitMQ (events: PaperCreated, NewPaperDetected, TrendUpdated, UserFollowedTopic)
 - Hangfire (Sync daily, Trend aggregation) + Cleanup notifications
 - EF Core SQLite (local) / PostgreSQL (Supabase)
 - Docker Compose

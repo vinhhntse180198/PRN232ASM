@@ -54,8 +54,9 @@ public static class PaperDataSeeder
         var context = scope.ServiceProvider.GetRequiredService<PaperServiceDbContext>();
 
         await context.Database.EnsureCreatedAsync(cancellationToken);
+        await PRN232ASM.BuildingBlocks.EventBus.Outbox.OutboxSchema.EnsureCreatedAsync(context, cancellationToken);
 
-        if (await context.ResearchPapers.CountAsync(cancellationToken) >= 303)
+        if (await context.ResearchPapers.CountAsync(cancellationToken) > 0)
         {
             return;
         }

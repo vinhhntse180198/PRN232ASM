@@ -13,13 +13,14 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? "Data Source=notify.db";
+            ?? "Server=localhost,1433;Database=NotificationDb;User Id=sa;Password=Prn232_Sql_Strong!2026;TrustServerCertificate=True;Encrypt=False;";
 
         services.AddDbContext<NotificationDbContext>(options =>
-            options.UseSqlite(connectionString));
+            options.UseSqlServer(connectionString));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddRabbitMqEventBus(configuration);
+        services.AddTransactionalOutbox<NotificationDbContext>();
         services.AddApplication();
         services.AddHostedService<BackgroundJobs.CleanupOldNotificationsJob>();
 

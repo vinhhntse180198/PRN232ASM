@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using PRN232ASM.BuildingBlocks.Common.Extensions;
+using PRN232ASM.PaperService.Api.Grpc;
 using PRN232ASM.PaperService.Api.Middleware;
 using PRN232ASM.PaperService.Application.Mappings;
 using PRN232ASM.PaperService.Infrastructure;
@@ -6,9 +8,17 @@ using PRN232ASM.PaperService.Infrastructure.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://localhost:5002");
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // REST (HTTP/1.1) + gRPC (HTTP/2) on the same port for Docker internal traffic.
+    options.ConfigureEndpointDefaults(endpoint =>
+    {
+        endpoint.Protocols = HttpProtocols.Http1AndHttp2;
+    });
+});
 
 builder.Services.AddControllers();
+builder.Services.AddGrpc();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationServices(typeof(MappingProfile));
@@ -26,5 +36,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
+app.MapGrpcService<PaperCatalogGrpcService>();
 
 app.Run();

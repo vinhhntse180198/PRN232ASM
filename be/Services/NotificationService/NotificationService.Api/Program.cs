@@ -6,15 +6,6 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
-// Ignore Postgres ConnectionStrings from shared be/.env when USE_SUPABASE_DB is not true
-if (!string.Equals(builder.Configuration["USE_SUPABASE_DB"], "true", StringComparison.OrdinalIgnoreCase))
-{
-    builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-    {
-        ["ConnectionStrings:DefaultConnection"] = "Data Source=notify.db"
-    });
-}
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,6 +24,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
     await db.Database.EnsureCreatedAsync();
+    await PRN232ASM.BuildingBlocks.EventBus.Outbox.OutboxSchema.EnsureCreatedAsync(db);
 }
 
 if (app.Environment.IsDevelopment())

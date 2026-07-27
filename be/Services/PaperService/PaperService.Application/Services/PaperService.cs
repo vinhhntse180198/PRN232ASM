@@ -33,6 +33,7 @@ public class PaperService : IPaperService
             request.Keyword,
             request.Author,
             request.Journal,
+            request.TopicId,
             cancellationToken);
 
         return new PagedResult<PaperSummaryResponse>
@@ -54,6 +55,13 @@ public class PaperService : IPaperService
 
     public async Task<PaperDetailResponse> CreateAsync(CreatePaperRequest request, CancellationToken cancellationToken = default)
     {
+        if (!string.IsNullOrWhiteSpace(request.Doi))
+        {
+            var existing = await _unitOfWork.ResearchPapers.GetByDoiAsync(request.Doi, cancellationToken);
+            if (existing is not null)
+                throw new ConflictException($"Paper with DOI '{request.Doi}' already exists.");
+        }
+
         var journal = await _unitOfWork.Journals.GetByNameAsync(request.JournalName, cancellationToken);
         if (journal is null)
         {
@@ -77,7 +85,9 @@ public class PaperService : IPaperService
             CitationCount = request.CitationCount,
             JournalId = journal.Id,
             Journal = journal,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Url = request.Url,
+            PdfUrl = request.PdfUrl
         };
 
         var authorOrder = 1;
@@ -146,7 +156,6 @@ public class PaperService : IPaperService
         }
 
         await _unitOfWork.ResearchPapers.AddAsync(paper, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         await _eventPublisher.PublishPaperCreatedAsync(new PaperCreatedEvent
         {
@@ -155,10 +164,18 @@ public class PaperService : IPaperService
             PublicationYear = paper.PublicationYear,
             TopicId = primaryTopic?.Id,
             TopicName = primaryTopic?.Name,
+            TopicIds = paper.PaperTopics.Select(pt => pt.TopicId).ToList(),
+            KeywordIds = paper.PaperKeywords.Select(pk => pk.KeywordId).ToList(),
             Keywords = paper.PaperKeywords.Select(pk => pk.Keyword.Name).ToList(),
             Authors = paper.PaperAuthors.OrderBy(pa => pa.AuthorOrder).Select(pa => pa.Author.Name).ToList(),
-            JournalName = journal.Name
+            JournalId = journal.Id,
+            JournalName = journal.Name,
+            Url = paper.Url,
+            PdfUrl = paper.PdfUrl
         }, cancellationToken);
+
+        // Paper + Outbox row commit together (transactional outbox).
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map<PaperDetailResponse>(paper);
     }

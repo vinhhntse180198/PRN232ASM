@@ -10,4 +10,8 @@ public record PaperDto(
     Guid? JournalId,
     IReadOnlyList<Guid> TopicIds,
     IReadOnlyList<Guid> KeywordIds,
-    IReadOnlyList<string> AuthorNames);
+    IReadOnlyList<string> AuthorNames)
+{
+    public string? Url { get; init; }
+    public string? PdfUrl { get; init; }
+}

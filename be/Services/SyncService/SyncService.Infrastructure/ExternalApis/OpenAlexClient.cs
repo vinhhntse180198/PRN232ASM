@@ -13,7 +13,7 @@ public class OpenAlexClient : IOpenAlexClient
     private readonly OpenAlexSettings _settings;
 
     private const string SelectFields =
-        "id,doi,title,display_name,abstract_inverted_index,publication_year,cited_by_count,authorships,primary_location,keywords,topics";
+        "id,doi,title,display_name,abstract_inverted_index,publication_year,cited_by_count,authorships,primary_location,best_oa_location,keywords,topics";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

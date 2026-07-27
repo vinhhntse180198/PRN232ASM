@@ -2,10 +2,9 @@ using AutoMapper;
 using Microsoft.Extensions.Options;
 using PRN232ASM.BuildingBlocks.Common.Exceptions;
 using PRN232ASM.BuildingBlocks.Contracts.Papers;
-using PRN232ASM.BuildingBlocks.EventBus.Abstractions;
+using PRN232ASM.BuildingBlocks.EventBus.Outbox;
 using SyncService.Application.DTOs;
 using SyncService.Application.Interfaces;
-using SyncService.Application.Services;
 using SyncService.Application.Settings;
 using SyncService.Domain.Entities;
 
@@ -16,7 +15,7 @@ public class SyncAppService : ISyncService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IOpenAlexClient _openAlexClient;
     private readonly IPaperImportClient _paperImportClient;
-    private readonly IEventBus _eventBus;
+    private readonly IOutboxWriter _outbox;
     private readonly IMapper _mapper;
     private readonly OpenAlexSettings _openAlexSettings;
 
@@ -24,14 +23,14 @@ public class SyncAppService : ISyncService
         IUnitOfWork unitOfWork,
         IOpenAlexClient openAlexClient,
         IPaperImportClient paperImportClient,
-        IEventBus eventBus,
+        IOutboxWriter outbox,
         IMapper mapper,
         IOptions<OpenAlexSettings> openAlexOptions)
     {
         _unitOfWork = unitOfWork;
         _openAlexClient = openAlexClient;
         _paperImportClient = paperImportClient;
-        _eventBus = eventBus;
+        _outbox = outbox;
         _mapper = mapper;
         _openAlexSettings = openAlexOptions.Value;
     }
@@ -122,26 +121,18 @@ public class SyncAppService : ISyncService
                     var request = OpenAlexWorkMapper.ToImportRequest(work);
                     if (request is null) continue;
 
-                    var result = await _paperImportClient.ImportAsync(request, cancellationToken);
-                    if (result == PaperImportResult.Created)
+                    var paperId = await _paperImportClient.GetCreatedPaperIdAsync(request, cancellationToken);
+                    if (paperId.HasValue)
                     {
                         imported++;
-                        var paperId = Guid.NewGuid();
 
-                        await _eventBus.PublishAsync(new PaperImportedEvent
+                        await _outbox.EnqueueAsync(new NewPaperDetectedEvent
                         {
-                            PaperId = paperId,
-                            Title = request.Title,
-                            SourceName = source.Name
-                        }, cancellationToken);
-
-                        await _eventBus.PublishAsync(new NewPaperDetectedEvent
-                        {
-                            PaperId = paperId,
+                            PaperId = paperId.Value,
                             Title = request.Title
                         }, cancellationToken);
                     }
-                    else if (result == PaperImportResult.SkippedDuplicate)
+                    else
                     {
                         skipped++;
                     }

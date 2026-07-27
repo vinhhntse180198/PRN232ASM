@@ -8,11 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\GrpcContracts\GrpcContracts.csproj" />
     <ProjectReference Include="..\PaperService.Application\PaperService.Application.csproj" />
     <ProjectReference Include="..\PaperService.Infrastructure\PaperService.Infrastructure.csproj" />
   </ItemGroup>

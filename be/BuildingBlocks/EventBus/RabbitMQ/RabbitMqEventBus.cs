@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PRN232ASM.BuildingBlocks.Contracts.Abstractions;
-using PRN232ASM.BuildingBlocks.Contracts.Abstractions;
 using PRN232ASM.BuildingBlocks.EventBus.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -55,27 +54,34 @@ public sealed class RabbitMqEventBus : IEventBus, IDisposable
     public Task InitializeAsync(CancellationToken cancellationToken = default)
         => EnsureInitializedAsync(cancellationToken);
 
-    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+    public Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
         where TEvent : IntegrationEvent
+        => PublishCoreAsync(@event, typeof(TEvent), cancellationToken);
+
+    public Task PublishAsync(IntegrationEvent @event, CancellationToken cancellationToken = default)
+        => PublishCoreAsync(@event, @event.GetType(), cancellationToken);
+
+    private async Task PublishCoreAsync(IntegrationEvent @event, Type eventType, CancellationToken cancellationToken)
     {
+        var eventName = eventType.Name;
+
         try
         {
             await EnsureInitializedAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Skipping publish of {EventName} because RabbitMQ is unavailable.", typeof(TEvent).Name);
-            return;
+            _logger.LogError(ex, "Failed to publish {EventName}: RabbitMQ is unavailable.", eventName);
+            throw new EventBusPublishException(eventName, "RabbitMQ is unavailable.", ex);
         }
 
         if (_channel is null)
         {
-            _logger.LogWarning("Skipping publish of {EventName}: RabbitMQ channel is not ready.", typeof(TEvent).Name);
-            return;
+            _logger.LogError("Failed to publish {EventName}: RabbitMQ channel is not ready.", eventName);
+            throw new EventBusPublishException(eventName, "RabbitMQ channel is not ready.");
         }
 
-        var eventName = typeof(TEvent).Name;
-        var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event, JsonOptions));
+        var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event, eventType, JsonOptions));
 
         var props = new BasicProperties
         {
@@ -85,13 +91,21 @@ public sealed class RabbitMqEventBus : IEventBus, IDisposable
             Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
 
-        await _channel.BasicPublishAsync(
-            exchange: _options.ExchangeName,
-            routingKey: eventName,
-            mandatory: false,
-            basicProperties: props,
-            body: body,
-            cancellationToken: cancellationToken);
+        try
+        {
+            await _channel.BasicPublishAsync(
+                exchange: _options.ExchangeName,
+                routingKey: eventName,
+                mandatory: false,
+                basicProperties: props,
+                body: body,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to publish {EventName} with id {EventId}", eventName, @event.Id);
+            throw new EventBusPublishException(eventName, "BasicPublish failed.", ex);
+        }
 
         _logger.LogInformation("Published event {EventName} with id {EventId}", eventName, @event.Id);
     }
@@ -125,7 +139,9 @@ public sealed class RabbitMqEventBus : IEventBus, IDisposable
 
             foreach (var eventName in _handlers.Keys)
             {
-                var queueName = $"{_options.ExchangeName}_{eventName}";
+                // One queue per service+event so competing consumers do not steal messages.
+                var prefix = string.IsNullOrWhiteSpace(_options.QueuePrefix) ? "default" : _options.QueuePrefix.Trim();
+                var queueName = $"{_options.ExchangeName}_{prefix}_{eventName}";
                 await _channel.QueueDeclareAsync(
                     queue: queueName,
                     durable: true,

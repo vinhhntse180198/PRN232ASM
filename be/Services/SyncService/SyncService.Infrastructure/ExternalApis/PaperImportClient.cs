@@ -20,28 +20,32 @@ public class PaperImportClient : IPaperImportClient
         _http.BaseAddress = new Uri(options.Value.BaseUrl.TrimEnd('/') + "/");
     }
 
-    public async Task<PaperImportResult> ImportAsync(PaperImportRequest request, CancellationToken cancellationToken = default)
+    public async Task<Guid?> GetCreatedPaperIdAsync(PaperImportRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
             var response = await _http.PostAsJsonAsync("api/papers/import", request, cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Conflict)
-                return PaperImportResult.SkippedDuplicate;
+                return null;
 
             if (!response.IsSuccessStatusCode)
             {
-                var body = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogWarning("Paper import failed for {ExternalId}: {Status} {Body}", request.ExternalId, response.StatusCode, body);
-                return PaperImportResult.Failed;
+                _logger.LogWarning("Paper import failed for {Title}: {Status}", request.Title, response.StatusCode);
+                return null;
             }
 
-            return PaperImportResult.Created;
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = System.Text.Json.JsonDocument.Parse(body);
+            var root = doc.RootElement;
+
+            Guid.TryParse(root.GetProperty("data").GetProperty("id").GetString(), out var paperId);
+            return paperId;
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Paper import request failed for {ExternalId}", request.ExternalId);
-            return PaperImportResult.Failed;
+            _logger.LogWarning(ex, "Paper import request failed for {Title}", request.Title);
+            return null;
         }
     }
 }

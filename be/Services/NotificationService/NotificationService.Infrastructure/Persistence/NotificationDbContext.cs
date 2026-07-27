@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NotificationService.Domain.Entities;
+using PRN232ASM.BuildingBlocks.EventBus.Outbox;
 
 namespace NotificationService.Infrastructure.Persistence;
 
@@ -11,6 +12,7 @@ public class NotificationDbContext : DbContext
     public DbSet<FollowTopic> FollowTopics => Set<FollowTopic>();
     public DbSet<FollowKeyword> FollowKeywords => Set<FollowKeyword>();
     public DbSet<FollowJournal> FollowJournals => Set<FollowJournal>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,5 +43,7 @@ public class NotificationDbContext : DbContext
             entity.ToTable("FollowJournals");
             entity.HasKey(x => new { x.UserId, x.JournalId });
         });
+
+        modelBuilder.ConfigureOutboxMessages();
     }
 }

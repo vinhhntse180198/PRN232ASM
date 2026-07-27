@@ -2,21 +2,21 @@ import ScrollReveal from '../ui/ScrollReveal'
 
 const testimonials = [
   {
-    quote: 'Collective OS helped us close $180k in partner-sourced deals in our first quarter. The matching is eerily accurate.',
-    name: 'Sarah Chen',
-    role: 'Founder, Pixel & Co.',
+    quote: 'SciTrend helped us identify emerging AI research topics months before they became mainstream. The trend analysis alone saved countless hours of manual literature review.',
+    name: 'Dr. Sarah Chen',
+    role: 'Associate Professor, Stanford CS',
     initials: 'SC',
   },
   {
-    quote: 'We expanded into video production without hiring a single editor. Our partners feel like an extension of our team.',
+    quote: 'As a PhD student, keeping up with publication trends in machine learning was overwhelming. This platform makes it manageable and insightful.',
     name: 'Marcus Webb',
-    role: 'CEO, Northline Agency',
+    role: 'PhD Candidate, MIT',
     initials: 'MW',
   },
   {
-    quote: 'The dashboard alone paid for itself. We finally have visibility into which partnerships actually drive revenue.',
-    name: 'Elena Rossi',
-    role: 'COO, Forma Labs',
+    quote: 'The keyword tracking feature is a game-changer. We finally have visibility into which research areas are gaining momentum.',
+    name: 'Dr. Elena Rossi',
+    role: 'Research Director, Forma Labs',
     initials: 'ER',
   },
 ]
@@ -27,9 +27,9 @@ export default function Testimonials() {
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="text-center font-display text-3xl font-bold tracking-tight text-primary sm:text-4xl">
-            Loved by Agencies Worldwide
+            Trusted by Researchers Worldwide
           </h2>
-          <p className="mt-2 text-center text-sm text-muted">2,000+ agency founders</p>
+          <p className="mt-2 text-center text-sm text-muted">Used by academics at leading universities and research institutions</p>
         </ScrollReveal>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">

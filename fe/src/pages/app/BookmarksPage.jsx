@@ -12,7 +12,7 @@ export default function BookmarksPage() {
 
   useEffect(() => {
     if (!user?.id) return
-    getBookmarks(user.id)
+    getBookmarks()
       .then(setBookmarks)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))

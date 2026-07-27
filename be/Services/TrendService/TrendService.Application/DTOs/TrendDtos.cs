@@ -37,6 +37,11 @@ public class DashboardResponse
     public IReadOnlyList<YearCountDto> PapersByYear { get; set; } = Array.Empty<YearCountDto>();
     public IReadOnlyList<KeywordCountDto> TopKeywords { get; set; } = Array.Empty<KeywordCountDto>();
     public int TotalPapers { get; set; }
+    public string? TopKeyword { get; set; }
+    public int TopKeywordCount { get; set; }
+    public int TotalKeywords { get; set; }
+    public int YearFrom { get; set; }
+    public int YearTo { get; set; }
     public DateTime GeneratedAt { get; set; }
 }
 

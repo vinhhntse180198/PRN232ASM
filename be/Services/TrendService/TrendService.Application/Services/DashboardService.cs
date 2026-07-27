@@ -20,21 +20,33 @@ public class DashboardService : IDashboardService
     {
         var trends = await _unitOfWork.PublicationTrends.GetAllAsync(cancellationToken);
 
+        var papersByYear = trends
+            .GroupBy(t => t.Year)
+            .Select(g => new YearCountDto { Year = g.Key, Count = g.Sum(x => x.PaperCount) })
+            .OrderBy(x => x.Year)
+            .ToList();
+
+        var keywordGroups = trends
+            .GroupBy(t => t.Keyword)
+            .Select(g => new { Keyword = g.Key, Count = g.Sum(x => x.PaperCount) })
+            .OrderByDescending(x => x.Count)
+            .ToList();
+
+        var topKeyword = keywordGroups.FirstOrDefault();
+
         return new DashboardResponse
         {
             TotalPapers = trends.Sum(t => t.PaperCount),
-            GeneratedAt = DateTime.UtcNow,
-            PapersByYear = trends
-                .GroupBy(t => t.Year)
-                .Select(g => new YearCountDto { Year = g.Key, Count = g.Sum(x => x.PaperCount) })
-                .OrderBy(x => x.Year)
+            PapersByYear = papersByYear,
+            TopKeywords = keywordGroups.Take(10)
+                .Select(x => new KeywordCountDto { Keyword = x.Keyword, Count = x.Count })
                 .ToList(),
-            TopKeywords = trends
-                .GroupBy(t => t.Keyword)
-                .Select(g => new KeywordCountDto { Keyword = g.Key, Count = g.Sum(x => x.PaperCount) })
-                .OrderByDescending(x => x.Count)
-                .Take(10)
-                .ToList()
+            TopKeyword = topKeyword?.Keyword,
+            TopKeywordCount = topKeyword?.Count ?? 0,
+            TotalKeywords = keywordGroups.Count,
+            YearFrom = papersByYear.Count == 0 ? 0 : papersByYear.Min(y => y.Year),
+            YearTo = papersByYear.Count == 0 ? 0 : papersByYear.Max(y => y.Year),
+            GeneratedAt = DateTime.UtcNow
         };
     }
 
@@ -48,23 +60,29 @@ public class DashboardService : IDashboardService
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var existing = await _unitOfWork.DashboardReports.GetByDateAsync(today, cancellationToken);
-        if (existing is not null)
-        {
-            return _mapper.Map<ReportResponse>(existing);
-        }
 
         var trends = await _unitOfWork.PublicationTrends.GetAllAsync(cancellationToken);
+        var totalPapers = trends.Sum(t => t.PaperCount);
         var topKeyword = trends
             .GroupBy(t => t.Keyword)
             .Select(g => new { Keyword = g.Key, Count = g.Sum(x => x.PaperCount) })
             .OrderByDescending(x => x.Count)
             .FirstOrDefault();
 
+        if (existing is not null)
+        {
+            existing.TotalPapers = totalPapers;
+            existing.TopKeyword = topKeyword?.Keyword ?? "N/A";
+            existing.GeneratedAt = DateTime.UtcNow;
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return _mapper.Map<ReportResponse>(existing);
+        }
+
         var report = new DashboardReport
         {
             Id = Guid.NewGuid(),
             ReportDate = today,
-            TotalPapers = trends.Sum(t => t.PaperCount),
+            TotalPapers = totalPapers,
             TopKeyword = topKeyword?.Keyword ?? "N/A",
             GeneratedAt = DateTime.UtcNow
         };

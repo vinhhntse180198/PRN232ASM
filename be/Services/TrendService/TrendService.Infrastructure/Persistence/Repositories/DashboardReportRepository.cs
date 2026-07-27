@@ -29,7 +29,6 @@ public class DashboardReportRepository : IDashboardReportRepository
     public async Task<DashboardReport?> GetByDateAsync(DateOnly reportDate, CancellationToken cancellationToken = default)
     {
         return await _context.DashboardReports
-            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.ReportDate == reportDate, cancellationToken);
     }
 }

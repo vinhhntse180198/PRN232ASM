@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PRN232ASM.BuildingBlocks.EventBus.Outbox;
 using SyncService.Domain.Entities;
 
 namespace SyncService.Infrastructure.Persistence;
@@ -9,6 +10,7 @@ public class SyncDbContext : DbContext
 
     public DbSet<DataSource> DataSources => Set<DataSource>();
     public DbSet<SyncLog> SyncLogs => Set<SyncLog>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,5 +32,7 @@ public class SyncDbContext : DbContext
                 .WithMany(x => x.SyncLogs)
                 .HasForeignKey(x => x.DataSourceId);
         });
+
+        modelBuilder.ConfigureOutboxMessages();
     }
 }

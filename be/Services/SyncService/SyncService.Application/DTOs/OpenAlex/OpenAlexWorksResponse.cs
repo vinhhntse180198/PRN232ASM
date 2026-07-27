@@ -37,6 +37,12 @@ public class OpenAlexWork
     [JsonPropertyName("primary_location")]
     public OpenAlexPrimaryLocation? PrimaryLocation { get; set; }
 
+    [JsonPropertyName("best_oa_location")]
+    public OpenAlexLocation? BestOaLocation { get; set; }
+
+    [JsonPropertyName("related_urls")]
+    public List<OpenAlexRelatedUrl>? RelatedUrls { get; set; }
+
     [JsonPropertyName("keywords")]
     public List<OpenAlexKeyword> Keywords { get; set; } = [];
 
@@ -60,6 +66,27 @@ public class OpenAlexPrimaryLocation
 {
     [JsonPropertyName("source")]
     public OpenAlexSource? Source { get; set; }
+
+    [JsonPropertyName("landing_page_url")]
+    public string? LandingPageUrl { get; set; }
+}
+
+public class OpenAlexLocation
+{
+    [JsonPropertyName("pdf_url")]
+    public string? PdfUrl { get; set; }
+
+    [JsonPropertyName("landing_page_url")]
+    public string? LandingPageUrl { get; set; }
+}
+
+public class OpenAlexRelatedUrl
+{
+    [JsonPropertyName("url")]
+    public string? Url { get; set; }
+
+    [JsonPropertyName("relationship_type")]
+    public string? RelationshipType { get; set; }
 }
 
 public class OpenAlexSource

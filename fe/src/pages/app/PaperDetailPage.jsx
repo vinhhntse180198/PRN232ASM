@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Bookmark, BookmarkCheck, Loader2 } from 'lucide-react'
+import { ArrowLeft, Bookmark, BookmarkCheck, Loader2, ExternalLink, FileText } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { addBookmark, getPaper, removeBookmark } from '../../services/paperService'
-import { getBookmarks } from '../../services/paperService'
+import { addBookmark, getPaper, getBookmarks, removeBookmark } from '../../services/paperService'
 
 export default function PaperDetailPage() {
   const { id } = useParams()
@@ -18,7 +17,7 @@ export default function PaperDetailPage() {
     setLoading(true)
     Promise.all([
       getPaper(id),
-      user?.id ? getBookmarks(user.id) : Promise.resolve([]),
+      getBookmarks(),
     ])
       .then(([p, bookmarks]) => {
         setPaper(p)
@@ -26,7 +25,7 @@ export default function PaperDetailPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [id, user?.id])
+  }, [id])
 
   const toggleBookmark = async () => {
     try {
@@ -54,9 +53,17 @@ export default function PaperDetailPage() {
     return <div className="alert-error">{error || 'Paper not found'}</div>
   }
 
+  const isMockDoi = paper.doi?.includes('prn232') || !paper.doi?.match(/^10\.\d{4,9}\/[^/]+$/)
+  const doiUrl = paper.doi && !isMockDoi ? `https://doi.org/${paper.doi}` : null
+  const openAlexSearchUrl = paper.title
+    ? `https://openalex.org/works?search=${encodeURIComponent(paper.title)}`
+    : null
+  const sourceUrlFromDb = paper.url && !paper.url.includes('web.archive.org') ? paper.url : null
+  const sourceUrl = sourceUrlFromDb || doiUrl || openAlexSearchUrl
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link to="/papers" className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary">
+      <Link to="/search" className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary">
         <ArrowLeft className="h-4 w-4" />
         Back to search
       </Link>
@@ -72,9 +79,63 @@ export default function PaperDetailPage() {
       <div className="flex flex-wrap gap-3 text-sm text-muted">
         <span>Year: {paper.publicationYear}</span>
         <span>Journal: {paper.journalName}</span>
-        <span>DOI: {paper.doi || 'N/A'}</span>
         <span>Citations: {paper.citationCount}</span>
       </div>
+
+      {/* DOI + Source Links */}
+      <div className="flex flex-wrap gap-3">
+        {doiUrl && (
+          <a
+            href={doiUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm text-muted transition-colors hover:border-accent-primary/40 hover:text-primary"
+          >
+            <ExternalLink className="h-4 w-4" />
+            View on DOI
+          </a>
+        )}
+        {sourceUrlFromDb && (
+          <a
+            href={sourceUrlFromDb}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm text-muted transition-colors hover:border-accent-primary/40 hover:text-primary"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Source
+          </a>
+        )}
+        {!doiUrl && openAlexSearchUrl && (
+          <a
+            href={openAlexSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-accent-primary/30 bg-accent-primary/10 px-4 py-2 text-sm text-accent-glow transition-colors hover:bg-accent-primary/20"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Search on OpenAlex
+          </a>
+        )}
+        {paper.pdfUrl && !paper.pdfUrl.includes('web.archive.org') && (
+          <a
+            href={paper.pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-accent-primary/30 bg-accent-primary/10 px-4 py-2 text-sm text-accent-glow transition-colors hover:bg-accent-primary/20"
+          >
+            <FileText className="h-4 w-4" />
+            Download PDF
+          </a>
+        )}
+      </div>
+
+      {paper.doi && (
+        <div className="rounded-lg border border-border bg-surface p-3">
+          <span className="text-xs text-muted">DOI: </span>
+          <span className="text-xs text-muted">{paper.doi}</span>
+        </div>
+      )}
 
       <section className="rounded-xl border border-border bg-surface p-6">
         <h2 className="mb-2 font-semibold text-primary">Abstract</h2>

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PRN232ASM.BuildingBlocks.EventBus.Outbox;
 using PRN232ASM.PaperService.Domain.Entities;
 
 namespace PRN232ASM.PaperService.Infrastructure.Persistence;
@@ -18,10 +19,12 @@ public class PaperServiceDbContext : DbContext
     public DbSet<PaperAuthor> PaperAuthors => Set<PaperAuthor>();
     public DbSet<PaperKeyword> PaperKeywords => Set<PaperKeyword>();
     public DbSet<PaperTopic> PaperTopics => Set<PaperTopic>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PaperServiceDbContext).Assembly);
+        modelBuilder.ConfigureOutboxMessages();
         base.OnModelCreating(modelBuilder);
     }
 }

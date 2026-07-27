@@ -1,10 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using PRN232ASM.BuildingBlocks.Contracts.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PRN232ASM.BuildingBlocks.Contracts.Abstractions;
 using PRN232ASM.BuildingBlocks.EventBus.Abstractions;
+using PRN232ASM.BuildingBlocks.EventBus.Outbox;
 using PRN232ASM.BuildingBlocks.EventBus.RabbitMQ;
 
 namespace PRN232ASM.BuildingBlocks.EventBus.Extensions;
@@ -17,6 +18,18 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RabbitMqEventBus>();
         services.AddSingleton<IEventBus>(sp => sp.GetRequiredService<RabbitMqEventBus>());
         services.AddHostedService<EventBusInitializerHostedService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers transactional outbox writer + background dispatcher for the given DbContext.
+    /// Call modelBuilder.ConfigureOutboxMessages() in OnModelCreating.
+    /// </summary>
+    public static IServiceCollection AddTransactionalOutbox<TContext>(this IServiceCollection services)
+        where TContext : DbContext
+    {
+        services.AddScoped<IOutboxWriter, EfOutboxWriter<TContext>>();
+        services.AddHostedService<OutboxDispatcherHostedService<TContext>>();
         return services;
     }
 

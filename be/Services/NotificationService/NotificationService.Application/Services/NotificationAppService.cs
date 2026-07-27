@@ -23,12 +23,15 @@ public class NotificationAppService : INotificationService
         return _mapper.Map<IReadOnlyList<NotificationDto>>(items);
     }
 
-    public async Task MarkAsReadAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task MarkAsReadAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
-        _ = await _unitOfWork.Notifications.GetByIdAsync(id, cancellationToken)
+        var notification = await _unitOfWork.Notifications.GetByIdAsync(id, cancellationToken)
             ?? throw new NotFoundException("Notification", id);
 
-        await _unitOfWork.Notifications.MarkAsReadAsync(id, cancellationToken);
+        if (notification.UserId != userId)
+            throw new UnauthorizedAccessException("Cannot mark another user's notification as read.");
+
+        notification.IsRead = true;
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

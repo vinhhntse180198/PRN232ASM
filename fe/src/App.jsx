@@ -22,6 +22,11 @@ import AdminDataSourcesPage from './pages/admin/AdminDataSourcesPage'
 import AdminSyncPage from './pages/admin/AdminSyncPage'
 import AdminMonitoringPage from './pages/admin/AdminMonitoringPage'
 import AdminReportsPage from './pages/admin/AdminReportsPage'
+import TrendsPage from './pages/app/TrendsPage'
+import ProfilePage from './pages/app/ProfilePage'
+import SearchPage from './pages/app/SearchPage'
+import AuthorsPage from './pages/app/AuthorsPage'
+import KeywordsPage from './pages/app/KeywordsPage'
 
 export default function App() {
   return (
@@ -40,12 +45,16 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/papers" element={<PapersPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/keywords" element={<KeywordsPage />} />
+            <Route path="/authors" element={<AuthorsPage />} />
+            <Route path="/topics" element={<TopicsPage />} />
             <Route path="/papers/:id" element={<PaperDetailPage />} />
             <Route path="/bookmarks" element={<BookmarksPage />} />
-            <Route path="/topics" element={<TopicsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/trends" element={<TrendsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
           <Route

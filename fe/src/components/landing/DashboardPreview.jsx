@@ -1,45 +1,43 @@
 import {
   BarChart3,
-  Briefcase,
-  LayoutDashboard,
-  MessageSquare,
+  BookOpen,
+  TrendingUp,
   Sparkles,
   Users,
+  FileText,
 } from 'lucide-react'
 import { useCountUp } from '../../hooks/useCountUp'
 import ScrollReveal from '../ui/ScrollReveal'
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Overview', active: true },
-  { icon: Users, label: 'Partners' },
-  { icon: Briefcase, label: 'Projects' },
-  { icon: MessageSquare, label: 'Messages' },
-  { icon: BarChart3, label: 'Analytics' },
+  { icon: BarChart3, label: 'Dashboard', active: true },
+  { icon: FileText, label: 'Papers' },
+  { icon: TrendingUp, label: 'Trends' },
+  { icon: Users, label: 'Topics' },
 ]
 
 const stats = [
-  { label: 'Total Revenue', value: 284500, prefix: '$', suffix: '', change: '+12.5%', positive: true },
-  { label: 'Active Partners', value: 500, suffix: 'k', change: '+8.1%', positive: true, format: 'k' },
-  { label: 'Open Opportunities', value: 23, suffix: '', change: '-2%', positive: false },
-  { label: 'Win Rate', value: 88, suffix: '%', change: '+4.2%', positive: true },
+  { label: 'Total Papers', value: 12847, suffix: '', change: '+12.5%', positive: true },
+  { label: 'Keywords Tracked', value: 342, suffix: '', change: '+8.1%', positive: true },
+  { label: 'Research Topics', value: 56, suffix: '', change: '+3', positive: true },
+  { label: 'Journals Covered', value: 189, suffix: '', change: '+12', positive: true },
 ]
 
-const opportunities = [
-  { name: 'Brand Refresh — NovaTech', value: '$42,000', status: 'Proposal', priority: 'High' },
-  { name: 'SEO Sprint — Lumina', value: '$18,500', status: 'Discovery', priority: 'Medium' },
-  { name: 'App Redesign — Orbit', value: '$24,500', status: 'Won', priority: 'Won' },
+const topKeywords = [
+  { name: 'machine learning', papers: 847 },
+  { name: 'deep learning', papers: 634 },
+  { name: 'neural networks', papers: 521 },
+  { name: 'natural language', papers: 398 },
 ]
 
 function StatCard({ stat, index }) {
-  const displayValue = stat.format === 'k' ? stat.value : stat.value
-  const { ref, formatted } = useCountUp(displayValue, 1400)
+  const { ref, formatted } = useCountUp(stat.value, 1400)
 
   return (
     <div className="rounded-xl border border-border bg-base/60 p-4">
       <p className="text-xs text-muted">{stat.label}</p>
       <p ref={ref} className="mt-1 font-mono text-xl font-semibold text-primary">
-        {stat.prefix}
-        {stat.format === 'k' ? `${formatted}k` : stat.suffix === '%' ? `${formatted}%` : Number(formatted).toLocaleString()}
+        {Number(formatted).toLocaleString()}
       </p>
       <p className={`mt-1 text-xs font-medium ${stat.positive ? 'text-accent-green' : 'text-red-400'}`}>
         {stat.change}
@@ -60,7 +58,7 @@ export default function DashboardPreview() {
               {/* Sidebar */}
               <aside className="hidden w-52 shrink-0 border-r border-border bg-base/80 p-4 md:block">
                 <div className="mb-6 flex items-center gap-2 font-display text-sm font-bold text-primary">
-                  Collective OS
+                  SciTrend
                   <span className="h-1.5 w-1.5 rounded-full bg-accent-primary" />
                 </div>
                 <nav className="space-y-1">
@@ -85,17 +83,11 @@ export default function DashboardPreview() {
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
                   <div>
                     <p className="text-xs text-muted">Dashboard</p>
-                    <h3 className="font-display text-lg font-bold text-primary">Welcome back, Rahim</h3>
+                    <h3 className="font-display text-lg font-bold text-primary">Research Overview</h3>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      className="rounded-lg bg-accent-primary px-3 py-1.5 text-xs font-semibold text-white"
-                    >
-                      New Deal
-                    </button>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-elevated text-xs font-bold text-accent-glow">
-                      R
+                      DR
                     </div>
                   </div>
                 </div>
@@ -107,27 +99,18 @@ export default function DashboardPreview() {
                 </div>
 
                 <div className="mt-4 rounded-xl border border-border bg-base/40 p-4">
-                  <p className="mb-3 text-sm font-semibold text-primary">Recent Opportunities</p>
+                  <p className="mb-3 text-sm font-semibold text-primary">Top Keywords This Month</p>
                   <div className="space-y-2">
-                    {opportunities.map((row) => (
+                    {topKeywords.map((row) => (
                       <div
                         key={row.name}
                         className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface/80 px-3 py-2 text-xs"
                       >
                         <span className="font-medium text-primary">{row.name}</span>
-                        <span className="font-mono text-muted">{row.value}</span>
-                        <span className="rounded-full bg-elevated px-2 py-0.5 text-muted">{row.status}</span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 ${
-                            row.priority === 'High'
-                              ? 'bg-accent-amber/15 text-accent-amber'
-                              : row.priority === 'Won'
-                                ? 'bg-accent-green/15 text-accent-green'
-                                : 'bg-accent-primary/10 text-accent-glow'
-                          }`}
-                        >
-                          {row.priority}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-muted">{row.papers.toLocaleString()} papers</span>
+                          <span className="rounded-full bg-accent-primary/10 px-2 py-0.5 text-muted">+5%</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -139,27 +122,22 @@ export default function DashboardPreview() {
           {/* Floating cards */}
           <div className="absolute -bottom-6 -right-2 z-10 hidden rounded-xl border border-border bg-surface p-3 shadow-card sm:block lg:-right-8">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-accent-primary" />
+              <TrendingUp className="h-4 w-4 text-accent-primary" />
               <div>
-                <p className="text-xs font-semibold text-primary">AI Matched</p>
-                <p className="text-[10px] text-muted">3 partners found</p>
+                <p className="text-xs font-semibold text-primary">Trending Up</p>
+                <p className="text-[10px] text-muted">+23% AI papers this week</p>
               </div>
-            </div>
-            <div className="mt-2 flex -space-x-2">
-              {['A', 'B', 'C'].map((l) => (
-                <div
-                  key={l}
-                  className="flex h-6 w-6 items-center justify-center rounded-full border border-base bg-elevated text-[9px] font-bold text-accent-glow"
-                >
-                  {l}
-                </div>
-              ))}
             </div>
           </div>
 
           <div className="absolute -left-2 top-1/3 z-10 hidden rounded-xl border border-accent-green/30 bg-surface p-3 shadow-card sm:block lg:-left-10">
-            <p className="text-xs font-semibold text-accent-green">Deal won: $24,500</p>
-            <p className="mt-1 text-[10px] text-muted">🎉 Confetti sent to team</p>
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-accent-green" />
+              <div>
+                <p className="text-xs font-semibold text-accent-green">New Papers</p>
+                <p className="text-[10px] text-muted">127 papers synced today</p>
+              </div>
+            </div>
           </div>
         </div>
       </ScrollReveal>
